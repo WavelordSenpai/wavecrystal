@@ -8,7 +8,7 @@ exports.handler = async (event) => {
     if (!prompt) return { statusCode: 400, headers, body: JSON.stringify({ answer: '', error: 'No prompt' }) };
     const key = process.env.GEMINI_API_KEY;
     if (!key) return { statusCode: 500, headers, body: JSON.stringify({ answer: '', error: 'No API key' }) };
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${key}`;
     const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
     const data = await res.json();
     console.log('GEMINI STATUS:', res.status, JSON.stringify(data).slice(0,800));
