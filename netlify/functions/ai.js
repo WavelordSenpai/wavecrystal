@@ -1,36 +1,19 @@
 exports.handler = async (event) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Content-Type': 'application/json'
-  };
+  const headers = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 'Content-Type': 'application/json' };
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '{}' };
   try {
-    const body = JSON.parse(event.body || '{}');
-    const prompt = body.prompt || body.message || body.text || body.question || '';
-    if (!prompt) return { statusCode: 400, headers, body: JSON.stringify({ answer: '', text: '', reply: '', error: 'No prompt' }) };
-
+    let prompt = '';
+    if (event.queryStringParameters) prompt = event.queryStringParameters.prompt || event.queryStringParameters.message || event.queryStringParameters.q || '';
+    if (event.body) { try { const b = JSON.parse(event.body); prompt = prompt || b.prompt || b.message || b.text || b.question || b.input || ''; } catch(e){ prompt = prompt || event.body; } }
+    if (!prompt) return { statusCode: 400, headers, body: JSON.stringify({ answer: '', error: 'No prompt' }) };
     const key = process.env.GEMINI_API_KEY;
-    if (!key) {
-      console.log('NO KEY FOUND');
-      return { statusCode: 500, headers, body: JSON.stringify({ answer: '', text: '', reply: '', error: 'No API key' }) };
-    }
-
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${key}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-    });
+    if (!key) return { statusCode: 500, headers, body: JSON.stringify({ answer: '', error: 'No API key' }) };
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`;
+    const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
     const data = await res.json();
-    console.log('GEMINI STATUS:', res.status, JSON.stringify(data).slice(0,500));
-    
+    console.log('GEMINI STATUS:', res.status, JSON.stringify(data).slice(0,800));
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    
-    if (!text) return { statusCode: 500, headers, body: JSON.stringify({ answer: '', text: '', reply: '', error: 'Gemini returned empty: ' + JSON.stringify(data).slice(0,500) }) };
-
-    // Return ALL field names so ANY frontend code will find it
+    if (!text) return { statusCode: 500, headers, body: JSON.stringify({ answer: '', error: 'Empty: ' + JSON.stringify(data).slice(0,500) }) };
     return { statusCode: 200, headers, body: JSON.stringify({ answer: text, text: text, reply: text, result: text }) };
-  } catch (e) {
-    console.log('FUNCTION ERROR:', e.message);
-    return { statusCode: 500, headers, body: JSON.stringify({ answer: '', text: '', reply: '', error: e.message }) };
-  }
+  } catch(e){ console.log('FUNCTION ERROR:', e.message); return { statusCode: 500, headers, body: JSON.stringify({ answer: '', error: e.message }) }; }
 };
