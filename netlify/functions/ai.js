@@ -14,7 +14,7 @@ exports.handler = async (event) => {
       return { statusCode: 500, headers, body: JSON.stringify({ answer: '', text: '', reply: '', error: 'No API key' }) };
     }
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${key}`;
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
