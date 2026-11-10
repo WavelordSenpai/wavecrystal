@@ -29,6 +29,7 @@ jobs:
           cp manifest.json www/manifest.json || true
           cp sw.js www/sw.js || true
           cp icon.png www/icon.png || true
+          cp fix.js www/fix.js || true
       - name: Add Android platform if needed
         run: |
           if [ ! -d "android" ]; then
