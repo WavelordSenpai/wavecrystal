@@ -25,6 +25,7 @@ public class MainActivity extends BridgeActivity {
         @JavascriptInterface
         public void enableMini() {
             getSharedPreferences("wave", MODE_PRIVATE).edit().putBoolean("mini", true).apply();
+            startService(new Intent(MainActivity.this, FloatingService.class));
             moveTaskToBack(true);
         }
         @JavascriptInterface
