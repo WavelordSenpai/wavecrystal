@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<style>*{margin:0;padding:0}body{background:transparent;overflow:hidden;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center}#c{width:150px;height:150px;display:block}#fallback{font-size:70px;display:none}</style>
+<style>*{margin:0;padding:0}html,body{background:transparent !important;overflow:hidden;width:100%;height:100%;display:flex;align-items:center;justify-content:center}#c{width:64px;height:64px;display:block;background:transparent !important}#fallback{font-size:40px;display:none}</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head><body><canvas id="c"></canvas><div id="fallback">⬢</div>
 <script>
 var p = new URLSearchParams(location.search);
 var shape = p.get('shape') || 'icosa';
 var SOLIDS = {tetra:{color:0xE9B44C},cube:{color:0x1A1210},octa:{color:0x4CAF7D},dodeca:{color:0x7C5CBF},icosa:{color:0xE8833A}};
-var colorHex = SOLIDS[shape] ? SOLIDS[shape].color : 0x00C896;
+var colorHex = SOLIDS[shape] ? SOLIDS[shape].color : 0xE8833A;
 var cParam = p.get('color');
 if(cParam){ try{ colorHex = parseInt(cParam.replace('#',''),16); }catch(e){} }
 if(typeof THREE==='undefined'){ document.getElementById('c').style.display='none'; document.getElementById('fallback').style.display='block'; }
 else{
   var scene=new THREE.Scene(); var camera=new THREE.PerspectiveCamera(45,1,0.1,100); camera.position.z=4.2;
-  var renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'),alpha:true,antialias:true}); renderer.setSize(150,150);
+  var renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'),alpha:true,antialias:true}); renderer.setClearColor(0x000000,0); renderer.setSize(64,64);
   var l1=new THREE.PointLight(0xffffff,1.2); l1.position.set(3,3,3); scene.add(l1);
   var l2=new THREE.PointLight(0xD4AF37,0.8); l2.position.set(-3,-2,2); scene.add(l2);
   scene.add(new THREE.AmbientLight(0x888888,1.2));
