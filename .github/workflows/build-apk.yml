@@ -46,32 +46,35 @@ jobs:
         run: |
           mkdir -p android/app/src/main/java/com/wavecrystal/app
           mkdir -p android/app/src/main/res/layout
+          mkdir -p android/app/src/main/res/drawable
           mkdir -p android/app/src/main/assets
-          cp overlay/FloatingService.java android/app/src/main/java/com/wavecrystal/app/FloatingService.java
           cp overlay/MainActivity.java android/app/src/main/java/com/wavecrystal/app/MainActivity.java
+          cp overlay/FloatingService.java android/app/src/main/java/com/wavecrystal/app/FloatingService.java
           cp overlay/float_crystal.xml android/app/src/main/res/layout/float_crystal.xml
+          cp overlay/bubble_bg.xml android/app/src/main/res/drawable/bubble_bg.xml
           cp overlay/crystal.html android/app/src/main/assets/crystal.html
+          echo "Overlay files copied"
+          ls -R android/app/src/main/java/com/wavecrystal/app
+          ls android/app/src/main/assets/
 
-      - name: Force fix onResume visibility
-        run: |
-          sed -i 's/protected void onResume/public void onResume/' android/app/src/main/java/com/wavecrystal/app/MainActivity.java
-          sed -i 's/protected void onActivityResult/public void onActivityResult/' android/app/src/main/java/com/wavecrystal/app/MainActivity.java
-
-      - name: Add overlay permission to Manifest
+      - name: Add overlay permission
         run: |
           MANIFEST=android/app/src/main/AndroidManifest.xml
-          grep -q SYSTEM_ALERT_WINDOW $MANIFEST || sed -i 's|<uses-permission android:name="android.permission.INTERNET" />|<uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />|' $MANIFEST
-          grep -q FloatingService $MANIFEST || sed -i 's|</application>|        <service android:name=".FloatingService" android:exported="false" />\n    </application>|' $MANIFEST
+          if ! grep -q "SYSTEM_ALERT_WINDOW" $MANIFEST; then
+            sed -i 's|<uses-permission android:name="android.permission.INTERNET" />|<uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />|' $MANIFEST
+          fi
+          grep -q "FloatingService" $MANIFEST || sed -i 's|</application>|        <service android:name=".FloatingService" android:exported="false" />\n    </application>|' $MANIFEST
+          echo "Manifest patched"
           cat $MANIFEST
 
       - name: Build APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
+          ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: wavecrystal-apk
+          name: wave-crystal-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
