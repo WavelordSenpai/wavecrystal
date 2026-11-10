@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 
 public class FloatingService extends Service {
 
@@ -19,17 +21,24 @@ public class FloatingService extends Service {
     private float initialTouchX, initialTouchY;
     private int initialX, initialY;
     private long touchStartTime;
+    private WebView webView;
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+    public IBinder onBind(Intent intent) { return null; }
 
     @Override
     public void onCreate() {
         super.onCreate();
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         floatView = LayoutInflater.from(this).inflate(R.layout.float_crystal, null);
+        webView = floatView.findViewById(R.id.crystalWebView);
+
+        WebSettings settings = webView.getSettings();
+        settings.setJavaScriptEnabled(true);
+        settings.setDomStorageEnabled(true);
+        webView.setBackgroundColor(0x00000000);
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        webView.loadUrl("file:///android_asset/crystal.html");
 
         int layoutType;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -39,7 +48,7 @@ public class FloatingService extends Service {
         }
 
         params = new WindowManager.LayoutParams(
-            180, 180,
+            450, 450,
             layoutType,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT);
@@ -84,6 +93,7 @@ public class FloatingService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (webView != null) webView.destroy();
         if (floatView != null) windowManager.removeView(floatView);
     }
 }
