@@ -1,48 +1,39 @@
 name: Build APK
-
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+            - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
+            - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Setup Java
+            - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
-
-      - name: Install dependencies
+            - name: Install dependencies
         run: npm install
-
-      - name: Create www folder
+            - name: Create www folder
         run: |
           mkdir -p www
           cp index.html www/index.html
           cp manifest.json www/manifest.json || true
           cp sw.js www/sw.js || true
           cp icon.png www/icon.png || true
-
-      - name: Add Android platform if needed
+            - name: Add Android platform if needed
         run: |
           if [ ! -d "android" ]; then
             npx cap add android
           fi
           npx cap sync android
-
-      - name: Copy overlay files into Android project
+            - name: Copy overlay files into Android project
         run: |
           mkdir -p android/app/src/main/java/com/wavecrystal/app
           mkdir -p android/app/src/main/res/layout
@@ -53,22 +44,19 @@ jobs:
           cp overlay/float_crystal.xml android/app/src/main/res/layout/float_crystal.xml
           cp overlay/bubble_bg.xml android/app/src/main/res/drawable/bubble_bg.xml
           cp overlay/crystal.html android/app/src/main/assets/crystal.html
-
-      - name: Add overlay permission
+            - name: Add overlay permission
         run: |
           MANIFEST=android/app/src/main/AndroidManifest.xml
           if ! grep -q "SYSTEM_ALERT_WINDOW" $MANIFEST; then
             sed -i 's|<uses-permission android:name="android.permission.INTERNET" />|<uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />|' $MANIFEST
           fi
           grep -q "FloatingService" $MANIFEST || sed -i 's|</application>|        <service android:name=".FloatingService" android:exported="false" />\n    </application>|' $MANIFEST
-
-      - name: Build APK
+            - name: Build APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
-
-      - name: Upload APK
+            - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: wave-crystal-apk
