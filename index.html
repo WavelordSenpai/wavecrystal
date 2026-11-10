@@ -93,7 +93,7 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
 </head>
 <body>
 <div id="stage">
-  <div id="top"><span>Wavelord • <b>Wave Crystal - The Crystal Lab</b></span><span>V6 • REAL AI</span></div>
+  <div id="top"><span>Wavelord • <b>Wave Crystal - The Crystal Lab</b></span><span>V7 • REAL AI</span></div>
   <div id="title">Wave Crystal<br><span>The Crystal Lab • Now With Real AI.</span></div>
   <p id="sub">Real dictionary. Real translation. Real AI questions. Any language.</p>
   <div id="streakBar">
@@ -161,6 +161,9 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
       <button class="btn small" onclick="aiIdea()">💡 AI Idea</button>
       <button class="btn small" onclick="aiTranslate()">🌍 AI Translate</button>
       <button class="btn small" onclick="aiMotivate()">🔥 AI Motivate Me</button>
+      <button class="btn small" onclick="aiQuote()">💬 AI Quote</button>
+      <button class="btn small" onclick="aiMusic()">🎵 AI Music Pick</button>
+      <button class="btn small" onclick="speakAI()">🔊 Speak AI Answer</button>
     </div>
     <input id="aiInput" placeholder="Or ask AI anything... e.g. Quiz me in Italian, give me a word, make a story about a crystal">
     <button class="btn gold" style="margin-top:8px;width:100%" onclick="aiAsk()">✨ Ask Wave AI</button>
@@ -195,7 +198,7 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
     <b id="installTitle">📲 Install Wave Crystal - The Crystal Lab</b>
     <p id="installText">Tap to install - real system popup</p>
   </button>
-  <p id="foot">Wave Crystal - The Crystal Lab V6 by Wavelord • Real Dictionary • Real Translation • Real AI<br>Your progress saves on your phone</p>
+  <p id="foot">Wave Crystal - The Crystal Lab V7 by Wavelord • Real Dictionary • Real Translation • Real AI<br>Your progress saves on your phone</p>
 </div>
 <script>
 var SOLIDS={
@@ -239,7 +242,7 @@ var SOLIDS={
     features:[
       {id:"flow", icon:"🌊", label:"Deep Flow", sub:"25 min", title:"🌊 Deep Flow", text:"One task. One timer. No switching. Flow happens when you stay on ONE thing for 20+ min."},
       {id:"music", icon:"🎧", label:"Focus Music", sub:"Lo-fi", title:"🎧 Focus Music", text:"Put on lo-fi / rain / brown noise. Same playlist every time = brain learns 'this means focus'."},
-      {id:"read", icon:"📖", label:"Read", sub:"AI Quote", title:"📖 AI Quote", text:"Tap AI Motivate Me - AI will give you a new quote / idea every time."},
+      {id:"read", icon:"📖", label:"Read", sub:"AI Quote", title:"📖 AI Quote", text:"Tap AI Quote below - AI invents a brand new quote every time, never from a list."},
       {id:"language", icon:"🌍", label:"Language", sub:"AI Quiz", title:"🌍 Language - AI Quiz", text:"Tap AI Quiz Me - AI creates a fresh quiz in your chosen language."},
       {id:"move", icon:"🏃", label:"Move", sub:"Quick stretch", title:"🏃 Move Break", text:"Between flows: 10 squats, shake hands, drink water. Flow needs body too."},
       {id:"review", icon:"🔁", label:"Review", sub:"What did I learn?", title:"🔁 Review", text:"After flow: Write 1 sentence - What did I learn? If you can say it, you know it."}
@@ -397,10 +400,22 @@ async function loadDailyWord(forceNew){
     defEl.textContent = "Could not load definition - check internet. Tap New Word to try again.";
   }
 }
+var LANG_VOICE = {es:'es-ES', it:'it-IT', fr:'fr-FR', pt:'pt-PT', de:'de-DE', ja:'ja-JP', hi:'hi-IN', en:'en-US'};
 function speakWord(){
   if(!currentDailyWord) return;
+  speechSynthesis.cancel();
   var u = new SpeechSynthesisUtterance(currentDailyWord);
-  u.lang='en-US'; speechSynthesis.speak(u);
+  u.lang = LANG_VOICE[currentLang] || 'en-US';
+  u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+function speakAI(){
+  if(!currentAIText){ alert('Generate an AI answer first, then tap Speak'); return; }
+  speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(currentAIText.slice(0,300));
+  u.lang = LANG_VOICE[currentLang] || 'en-US';
+  u.rate = 0.95;
+  speechSynthesis.speak(u);
 }
 async function translateDailyWord(){
   if(!currentDailyWord) return;
@@ -475,15 +490,15 @@ async function aiAsk(){
   if(!q) q = `Give me a fun language quiz question in ${langNames[currentLang]} for a beginner. Format: Question: ... Answer: ...`;
   await callAI(q + ` (Answer in ${langNames[currentLang]} if it's a language question, otherwise in English. Keep it short, fun, for a teen.)`);
 }
+var QUIZ_BANK = ['Where is the library?','I want water please','My name is Alex','I love music','How much does this cost?','I am tired today','Can you help me?','What time is it?','I like football','Where are you from?','I am hungry','Good morning, have a nice day','My favorite color is blue','I want to learn this language','See you tomorrow','This is delicious','I am going to school','It is raining today','I have a dog','Can I have a coffee please?','I am happy today','Where is the beach?','I need help with homework','My friend is funny','I love this song','What is your name?','I am 16 years old','Let us go to the park','I am studying for a test','This crystal is beautiful'];
 async function aiQuiz(){
   document.getElementById('aiQuizBox').style.display='block';
-  var topics=['animals','food','football','music','gaming','crystals','school','travel','movies','space','family','sports'];
-  var t=topics[Math.floor(Math.random()*topics.length)];
-  var seed=Math.floor(Math.random()*99999);
-  let prompt = `Create ONE beginner language quiz question in ${langNames[currentLang]} about ${t}. Seed ${seed}. The user is learning ${langNames[currentLang]}. Give a question like "How do you say 'Hello, how are you?' in ${langNames[currentLang]}?" Then give the correct answer on a new line starting with ANSWER: . Keep it simple. Only one question. Make it completely different from previous quizzes.`;
+  var phrase = QUIZ_BANK[Math.floor(Math.random()*QUIZ_BANK.length)];
+  var seed = Math.floor(Math.random()*999999);
+  let prompt = `Seed ${seed}. You are a ${langNames[currentLang]} teacher. Teach the phrase "${phrase}" in ${langNames[currentLang]}. NEVER use "Hello, how are you" - use ONLY this phrase: "${phrase}". Format EXACTLY like this:\nQuestion: How do you say "${phrase}" in ${langNames[currentLang]}?\nANSWER: [translation in ${langNames[currentLang]}]\nPronunciation: [how to say it]`;
   let answer = await callAI(prompt);
   let match = answer.match(/ANSWER:\s*(.+)/i);
-  if(match) currentAIQuizAnswer = match[1].trim();
+  if(match) currentAIQuizAnswer = match[1].trim().split('\n')[0];
   else currentAIQuizAnswer = answer;
   document.getElementById('aiQuizResult').textContent = "Type your answer above and tap Check Answer. +20 XP if correct!";
 }
@@ -494,14 +509,12 @@ async function aiStory(){
   var h=heroes[Math.floor(Math.random()*heroes.length)];
   var p=places[Math.floor(Math.random()*places.length)];
   var tw=twists[Math.floor(Math.random()*twists.length)];
-  var seed=Math.floor(Math.random()*99999);
-  await callAI(`Seed ${seed}. Write a 3-sentence story starter about ${h} ${p} who finds a crystal where ${tw}. Mysterious and fun for a teen. End with a cliffhanger. Never use Maya. Never repeat a previous story.`);
+  await callAI(`Seed ${Math.floor(Math.random()*999999)}. Write a 3-sentence story starter about ${h} ${p} who finds a crystal where ${tw}. Mysterious and fun for a teen. End with a cliffhanger. Never use Maya. Never repeat a previous story.`);
 }
 async function aiIdea(){
   var categories=['a game for kids who hate homework','an app for sneaker collectors','a business for gamers','a tool for music lovers','an app for pet owners','a game about crystals and focus','a business for football fans','an app for learning languages with friends','a tool for TikTok creators','a game for people who love food','an app for saving money as a teen','a business selling custom phone cases','an app for shy people to make friends','a game about cooking in space','an app for skateboarders','a business for artists'];
   var pick=categories[Math.floor(Math.random()*categories.length)];
-  var seed=Math.floor(Math.random()*99999);
-  await callAI(`Seed ${seed}. Give me ONE creative business / game / app idea about ${pick}. A teen could build it in 1 week. Make it original and fun. NEVER repeat a previous idea. Format: Idea: ... Why it works: ... First step: ...`);
+  await callAI(`Seed ${Math.floor(Math.random()*999999)}. Give me ONE creative business / game / app idea about ${pick}. A teen could build it in 1 week. Make it original and fun. NEVER repeat a previous idea. Format: Idea: ... Why it works: ... First step: ...`);
 }
 async function aiTranslate(){
   let text = document.getElementById('aiInput').value.trim() || "I am focused and I am building my future";
@@ -511,21 +524,29 @@ async function aiTranslate(){
   document.getElementById('aiActions').style.display='flex';
 }
 async function aiMotivate(){
-  var vibes=['grind mode','comeback mode','focus mode','gym mode','study mode','building your app mode','no excuses mode','main character mode','after a bad day mode','early morning mode'];
-  var v=vibes[Math.floor(Math.random()*vibes.length)];
-  var seed=Math.floor(Math.random()*99999);
-  await callAI(`Seed ${seed}. Give me a 2-sentence hype motivation for ${v}. Make it original, not the same old quote. Talk like a cool older brother. Mention Wave Crystal once. Never repeat a previous motivation.`);
+  await callAI(`Seed ${Math.floor(Math.random()*999999)}. Invent a brand new 2-sentence hype motivation right now, from scratch. Do NOT pick from a list. Talk like a cool older brother. Mention Wave Crystal once. Never repeat a previous motivation.`);
+}
+async function aiQuote(){
+  await callAI(`Seed ${Math.floor(Math.random()*999999)}. Invent ONE brand new original quote that has NEVER existed before. Do NOT pick from a list. Do NOT use a famous quote. Make it up right now from scratch about whatever you feel like - life, focus, grind, being different, starting small, confidence, whatever hits hardest today. 1 sentence only, powerful, teen would post it. Then on a new line: Why it hits: 1 sentence.`);
+}
+async function aiMusic(){
+  await callAI(`Seed ${Math.floor(Math.random()*999999)}. You pick the vibe. Do NOT pick from a list I gave you. Choose any mood you want right now - focus, hype, chill, sad, party, late night, heartbreak, whatever. Then recommend 3 REAL songs that exist for that vibe. Format: Vibe: ...\n1. Song - Artist - Why it fits\n2. Song - Artist - Why it fits\n3. Song - Artist - Why it fits\nOnly real songs.`);
 }
 async function aiUseWordInSentence(){
-  if(!currentDailyWord) return;
-  await callAI(`Use the word "${currentDailyWord}" in a cool sentence a teen would understand, and also translate that sentence to ${langNames[currentLang]}. Seed ${Math.floor(Math.random()*99999)}.`);
+  if(!currentDailyWord){ document.getElementById('aiResult').textContent='Load a Daily Word first!'; return; }
+  document.getElementById('aiResult').textContent = `🤖 AI is thinking about "${currentDailyWord}"...`;
+  var cleanWord = currentDailyWord.replace(/[^a-zA-Z-]/g,'');
+  await callAI(`Seed ${Math.floor(Math.random()*999999)}. Use the word "${cleanWord}" in 1 cool sentence a teen would understand. Then translate that sentence to ${langNames[currentLang]}. Format: Sentence: ...\n${langNames[currentLang]}: ...\nPronunciation: ...`);
 }
 function checkAIQuiz(){
   let userAns = document.getElementById('aiQuizInput').value.toLowerCase().trim();
   let correct = currentAIQuizAnswer.toLowerCase().trim();
   if(!userAns){ document.getElementById('aiQuizResult').textContent="Type an answer first!"; return; }
-  if(correct.includes(userAns) || userAns.includes(correct) || userAns.length>2 && correct.split(' ').some(w=> userAns.includes(w.toLowerCase()))){
-    document.getElementById('aiQuizResult').textContent="✅ Correct! +20 XP! You got it!";
+  let userWords = userAns.split(' ').filter(w=>w.length>2);
+  let correctWords = correct.split(' ').filter(w=>w.length>2);
+  let matches = userWords.filter(w=> correct.includes(w)).length;
+  if(correct.includes(userAns) || userAns.includes(correct) || matches>=1){
+    document.getElementById('aiQuizResult').textContent="✅ Correct! +20 XP! AI answer was: " + currentAIQuizAnswer;
     addXP(20);
   } else {
     document.getElementById('aiQuizResult').textContent=`Not quite. AI says correct answer is: ${currentAIQuizAnswer}. Try again!`;
@@ -552,4 +573,4 @@ window.onload=function(){
 };
 </script>
 </body>
-  </html>
+</html>
