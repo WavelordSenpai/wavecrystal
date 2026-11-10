@@ -20,6 +20,24 @@ jobs:
         run: npm install @capacitor/core @capacitor/cli @capacitor/android
       - name: Add Android
         run: npx cap add android
+      - name: Copy Overlay Files
+        run: |
+          cp overlay/FloatingService.java android/app/src/main/java/com/wavecrystal/app/FloatingService.java
+          cp overlay/MainActivity.java android/app/src/main/java/com/wavecrystal/app/MainActivity.java
+          cp overlay/float_crystal.xml android/app/src/main/res/layout/float_crystal.xml
+      - name: Add Overlay Permissions
+        run: |
+          python3 -c "
+          import pathlib
+          p = pathlib.Path('android/app/src/main/AndroidManifest.xml')
+          t = p.read_text()
+          if 'SYSTEM_ALERT_WINDOW' not in t:
+              t = t.replace('<uses-permission android:name=\"android.permission.INTERNET\" />', '<uses-permission android:name=\"android.permission.INTERNET\" />\n    <uses-permission android:name=\"android.permission.SYSTEM_ALERT_WINDOW\" />\n    <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE\" />')
+          if 'FloatingService' not in t:
+              t = t.replace('</application>', '        <service android:name=\".FloatingService\" android:exported=\"false\" />\n    </application>')
+          p.write_text(t)
+          print('patched')
+          "
       - name: Sync
         run: npx cap sync android
       - name: Build APK
