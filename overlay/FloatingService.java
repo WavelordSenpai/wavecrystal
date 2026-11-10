@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 public class FloatingService extends Service {
@@ -36,10 +37,20 @@ public class FloatingService extends Service {
         crystalWeb = floatView.findViewById(R.id.crystalWeb);
         closeBtn = floatView.findViewById(R.id.closeBtn);
 
-        // Load your crystal in the bubble WebView
-        crystalWeb.getSettings().setJavaScriptEnabled(true);
+        // --- FIXED: Load ONLY the solid, not the whole webpage ---
+        WebSettings s = crystalWeb.getSettings();
+        s.setJavaScriptEnabled(true);
+        s.setAllowFileAccess(true);
+        s.setAllowContentAccess(true);
+        s.setAllowFileAccessFromFileURLs(true);
+        s.setAllowUniversalAccessFromFileURLs(true);
+        s.setDomStorageEnabled(true);
         crystalWeb.setBackgroundColor(0x00000000);
-        crystalWeb.loadUrl("file:///android_asset/index.html");
+
+        SharedPreferences prefs = getSharedPreferences("wave", MODE_PRIVATE);
+        String shape = prefs.getString("shape", "octa");
+        String color = prefs.getString("color", "#FFD700");
+        crystalWeb.loadUrl("file:///android_asset/bubble.html?shape=" + shape + "&color=" + color.replace("#", "%23"));
 
         params = new WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -59,9 +70,6 @@ public class FloatingService extends Service {
         });
         closeBtn.bringToFront();
 
-        // --- THIS IS THE FIX ---
-        // WebView eats touches, so we put the drag logic ON the WebView itself
-        // and return true so it doesn't swallow it
         View.OnTouchListener dragTouch = new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -88,7 +96,6 @@ public class FloatingService extends Service {
 
                     case MotionEvent.ACTION_UP:
                         long touchTime = System.currentTimeMillis() - touchDownTime;
-                        // Quick tap = reopen app, Drag = just move
                         if (!isDragging && touchTime < 300) {
                             Intent i = new Intent(FloatingService.this, MainActivity.class);
                             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -101,7 +108,6 @@ public class FloatingService extends Service {
             }
         };
 
-        // Put drag on BOTH - WebView + whole bubble
         crystalWeb.setOnTouchListener(dragTouch);
         floatView.setOnTouchListener(dragTouch);
     }
