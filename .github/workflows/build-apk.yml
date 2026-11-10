@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -16,6 +17,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -23,54 +25,26 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Install dependencies
-        run: npm install
+        run: npm ci || npm install
 
-      - name: Prepare web files
-        run: |
-          mkdir -p www
-          cp index.html www/ 2>/dev/null || true
-          cp manifest.json www/ 2>/dev/null || true
-          cp sw.js www/ 2>/dev/null || true
-          cp icon.png www/ 2>/dev/null || true
-
-      - name: Setup Android project
+      - name: Add Android platform if needed
         run: |
           if [ ! -d "android" ]; then
             npx cap add android
           fi
           npx cap sync android
 
-      - name: Copy overlay into Android project
+      - name: Copy overlay files into Android project
         run: |
           mkdir -p android/app/src/main/java/com/wavecrystal/app
-          mkdir -p android/app/src/main/res/layout
-          mkdir -p android/app/src/main/res/drawable
-          cp overlay/FloatingService.java android/app/src/main/java/com/wavecrystal/app/
-          cp overlay/MainActivity.java android/app/src/main/java/com/wavecrystal/app/
-          cp icon.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-          cat > android/app/src/main/res/layout/float_crystal.xml << 'EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="72dp"
-              android:layout_height="72dp">
-              <ImageView
-                  android:id="@+id/crystalIcon"
-                  android:layout_width="72dp"
-                  android:layout_height="72dp"
-                  android:src="@mipmap/ic_launcher"
-                  android:background="@drawable/bubble_bg"
-                  android:contentDescription="Wave Crystal" />
-          </FrameLayout>
-          EOF
-          cat > android/app/src/main/res/drawable/bubble_bg.xml << 'EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <shape xmlns:android="http://schemas.android.com/apk/res/android"
-              android:shape="oval">
-              <solid android:color="#CC7C4DFF" />
-              <stroke android:width="2dp" android:color="#FFFFFF" />
-          </shape>
-          EOF
+          cp overlay/FloatingService.java android/app/src/main/java/com/wavecrystal/app/FloatingService.java
+          cp overlay/MainActivity.java android/app/src/main/java/com/wavecrystal/app/MainActivity.java
+          cp overlay/float_crystal.xml android/app/src/main/res/layout/float_crystal.xml
+          cp overlay/bubble_bg.xml android/app/src/main/res/layout/bubble_bg.xml
 
       - name: Build APK
         run: |
@@ -81,5 +55,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: wave-crystal-apk
+          name: wavecrystal-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
