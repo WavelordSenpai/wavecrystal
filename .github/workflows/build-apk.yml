@@ -16,8 +16,8 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
-      - name: Install Capacitor
-        run: npm install @capacitor/core @capacitor/cli @capacitor/android
+            - name: Install Capacitor
+        run: npm install @capacitor/core @capacitor/cli @capacitor/android typescript
       - name: Add Android
         run: npx cap add android
       - name: Copy Overlay Files
