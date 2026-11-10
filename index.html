@@ -68,6 +68,10 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
 .langBtn.active{background:#D4AF37;color:#000;border-color:#D4AF37}
 #aiInput{width:100%;padding:12px;border-radius:12px;border:1px solid #333;background:#000;color:#fff;font-size:14px;margin-top:10px}
 #aiResult{margin-top:10px;font-size:13px;line-height:1.6;color:#E8E0C8;white-space:pre-wrap}
+#savedBox{width:100%;max-width:520px;margin-top:14px;background:#141414;border:1px solid #232323;border-radius:20px;padding:18px}
+#savedBox h3{font-size:15px;color:#D4AF37}
+.savedItem{background:#0F0F0F;border:1px solid #222;border-radius:12px;padding:12px;margin-top:10px;font-size:12px;line-height:1.6;white-space:pre-wrap}
+.savedItem button{margin-top:8px}
 #dailyWordCard{width:100%;max-width:520px;margin-top:14px;background:#141414;border:1px solid #232323;border-radius:20px;padding:18px}
 #dailyWordCard h3{font-size:15px;color:#D4AF37}
 #dailyWordCard h2{font-size:26px;margin-top:6px}
@@ -89,17 +93,15 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
 </head>
 <body>
 <div id="stage">
-  <div id="top"><span>Wavelord • <b>Wave Crystal - The Crystal Lab</b></span><span>V4 • REAL AI</span></div>
+  <div id="top"><span>Wavelord • <b>Wave Crystal - The Crystal Lab</b></span><span>V6 • REAL AI</span></div>
   <div id="title">Wave Crystal<br><span>The Crystal Lab • Now With Real AI.</span></div>
   <p id="sub">Real dictionary. Real translation. Real AI questions. Any language.</p>
-
   <div id="streakBar">
     <div class="stat"><b id="streakNum">🔥 1</b><small>Day Streak</small></div>
     <div class="stat"><b id="sessionNum">0</b><small>Focus Today</small></div>
     <div class="stat"><b id="totalNum">0</b><small>Total Focus</small></div>
     <div class="stat"><b id="xpNum">0 XP</b><small>Your XP</small></div>
   </div>
-
   <div id="canvasWrap" onclick="tapCrystal()">
     <canvas id="threeCanvas"></canvas>
     <div id="fallback">⬢</div>
@@ -109,7 +111,6 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
     <h3 id="solidName">Icosahedron - Flow / Water</h3>
     <p id="solidDesc">20 faces. Flow. Unique powers: Deep Flow, No Distraction, Music Focus.</p>
   </div>
-
   <div id="solids">
     <div class="solidBtn" data-key="tetra" onclick="switchSolid('tetra',this)"><span>🔺</span><b>Tetrahedron</b><small>15m • Sprint</small></div>
     <div class="solidBtn" data-key="cube" onclick="switchSolid('cube',this)"><span>⬛</span><b>Cube</b><small>60m • Routine</small></div>
@@ -117,7 +118,6 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
     <div class="solidBtn" data-key="dodeca" onclick="switchSolid('dodeca',this)"><span>⬣</span><b>Dodecahedron</b><small>45m • Ideas</small></div>
     <div class="solidBtn active" data-key="icosa" onclick="switchSolid('icosa',this)"><span>⬢</span><b>Icosahedron</b><small>25m • Flow</small></div>
   </div>
-
   <div id="timerWrap">
     <div id="mode">Flow Mode • Icosahedron • 25 min</div>
     <div id="timer">25:00</div>
@@ -130,7 +130,6 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
       <button class="tbtn red" id="stopBtn" onclick="stopTimer()" disabled>■ Stop</button>
     </div>
   </div>
-
   <div id="dailyWordCard">
     <h3>📖 DAILY WORD <span class="badge">LIVE FROM DICTIONARY</span> <button class="btn small gold" onclick="loadDailyWord(true)" style="float:right">↻ New Word</button></h3>
     <h2 id="dailyWord">Loading...</h2>
@@ -143,7 +142,6 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
       <button class="btn small gold" onclick="aiUseWordInSentence()">🤖 AI: Use In Sentence</button>
     </div>
   </div>
-
   <div id="aiBox">
     <h3>🤖 Wave AI <span>• Powered by Groq</span></h3>
     <p id="aiDesc">Ask anything. It creates new questions, stories, ideas - never repeats. Pick a language, pick a mode.</p>
@@ -167,13 +165,22 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
     <input id="aiInput" placeholder="Or ask AI anything... e.g. Quiz me in Italian, give me a word, make a story about a crystal">
     <button class="btn gold" style="margin-top:8px;width:100%" onclick="aiAsk()">✨ Ask Wave AI</button>
     <div id="aiResult"></div>
+    <div id="aiActions" style="display:none;margin-top:10px;gap:6px;flex-wrap:wrap">
+      <button class="btn small gold" onclick="saveCurrentAI()">💾 Save This Idea</button>
+      <button class="btn small" onclick="copyCurrentAI()">📋 Copy</button>
+      <button class="btn small" onclick="aiIdea()">↻ New Idea</button>
+    </div>
     <div id="aiQuizBox" style="display:none;margin-top:10px">
       <input id="aiQuizInput" placeholder="Type your answer here..." style="width:100%;padding:12px;border-radius:12px;border:1px solid #333;background:#000;color:#fff;font-size:14px">
       <button class="btn gold" style="margin-top:8px" onclick="checkAIQuiz()">Check Answer</button>
       <p id="aiQuizResult" style="font-size:12px;margin-top:8px;color:#D4AF37"></p>
     </div>
   </div>
-
+  <div id="savedBox">
+    <h3>💾 My Saved Ideas <span id="savedCount" class="badge">0</span> <button class="btn small" onclick="clearSaved()" style="float:right">Clear All</button></h3>
+    <p style="font-size:12px;color:#A8A090;margin-top:6px">Tap Save This Idea on any AI answer to keep it here forever, even after you close the app.</p>
+    <div id="savedList"><p style="font-size:12px;color:#888;margin-top:10px">No saved ideas yet. Generate an idea and tap Save.</p></div>
+  </div>
   <div id="card">
     <h3 id="cardTitle">⬢ Icosahedron - Flow Ritual</h3>
     <p id="cardText">Headphones on. One tab only. No phone. Let the flow take you.</p>
@@ -183,16 +190,13 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
       <button class="btn" onclick="showNextFeature()">↻ Next Idea</button>
     </div>
   </div>
-
   <div id="grid"></div>
-
   <button id="installReal" onclick="realInstall()">
     <b id="installTitle">📲 Install Wave Crystal - The Crystal Lab</b>
     <p id="installText">Tap to install - real system popup</p>
   </button>
-  <p id="foot">Wave Crystal - The Crystal Lab V4 by Wavelord • Real Dictionary • Real Translation • Real AI<br>Your progress saves on your phone</p>
+  <p id="foot">Wave Crystal - The Crystal Lab V6 by Wavelord • Real Dictionary • Real Translation • Real AI<br>Your progress saves on your phone</p>
 </div>
-
 <script>
 var SOLIDS={
   tetra:{name:"Tetrahedron - Sprint / Fire", desc:"4 faces • Fire • 15 min sprint. For: homework, quick tasks, beating procrastination.", mode:"Sprint Mode • Tetrahedron • 15 min", minutes:15, emoji:"🔺", color:0xFF6B00, label:"TETRAHEDRON • TAP ME", ritual:{title:"🔺 Tetrahedron - Sprint Ritual", text:"Set ONE tiny goal. Example: 'Write 1 paragraph'. Set timer 15 min. No perfection. Just speed. Go!"},
@@ -247,6 +251,7 @@ var currentLang='es';
 var langNames={es:'Spanish',it:'Italian',fr:'French',pt:'Portuguese',de:'German',ja:'Japanese',hi:'Hindi',en:'English'};
 var currentAIQuizAnswer='';
 var currentDailyWord='';
+var currentAIText='';
 var scene, camera, renderer, currentMesh=null;
 function init3D(){
   if(typeof THREE==='undefined'){ document.getElementById('fallback').style.display='block'; return; }
@@ -389,7 +394,7 @@ async function loadDailyWord(forceNew){
     metaEl.textContent = entry.phonetic ? `Pronunciation: ${entry.phonetic} • Source: Free Dictionary API • Real, live from internet` : "Source: Free Dictionary API • Real, live from internet";
   } catch(e){
     wordEl.textContent = word;
-    defEl.textContent = "Could not load definition - check internet. Tap ↻ New Word to try again.";
+    defEl.textContent = "Could not load definition - check internet. Tap New Word to try again.";
   }
 }
 function speakWord(){
@@ -415,9 +420,35 @@ function setLang(lang, el){
   if(el) el.classList.add('active');
   document.getElementById('aiDesc').textContent = `Language set to ${langNames[lang]}. AI will now quiz you in ${langNames[lang]}.`;
 }
+function getSavedIdeas(){ try{ return JSON.parse(localStorage.getItem('waveSavedIdeas')||'[]'); }catch(e){ return []; } }
+function renderSaved(){
+  var list=getSavedIdeas();
+  document.getElementById('savedCount').textContent=list.length;
+  var box=document.getElementById('savedList');
+  if(!list.length){ box.innerHTML='<p style="font-size:12px;color:#888;margin-top:10px">No saved ideas yet. Generate an idea and tap Save.</p>'; return; }
+  box.innerHTML='';
+  list.forEach(function(item, idx){
+    var d=document.createElement('div'); d.className='savedItem';
+    d.textContent=item;
+    var del=document.createElement('button'); del.className='btn small'; del.textContent='🗑 Delete';
+    del.onclick=function(){ var a=getSavedIdeas(); a.splice(idx,1); localStorage.setItem('waveSavedIdeas', JSON.stringify(a)); renderSaved(); };
+    d.appendChild(document.createElement('br')); d.appendChild(del);
+    box.appendChild(d);
+  });
+}
+function saveCurrentAI(){
+  if(!currentAIText || currentAIText.indexOf('thinking')!==-1){ alert('Generate an AI answer first!'); return; }
+  var a=getSavedIdeas(); a.unshift(currentAIText.slice(0,800)); localStorage.setItem('waveSavedIdeas', JSON.stringify(a.slice(0,50))); renderSaved(); addXP(10); alert('Saved! +10 XP');
+}
+function copyCurrentAI(){
+  if(!currentAIText) return;
+  if(navigator.clipboard) navigator.clipboard.writeText(currentAIText).then(function(){ alert('Copied!'); });
+}
+function clearSaved(){ if(confirm('Delete all saved ideas?')){ localStorage.setItem('waveSavedIdeas','[]'); renderSaved(); } }
 async function callAI(prompt){
   document.getElementById('aiResult').textContent = "🤖 AI is thinking... (calling Groq)";
   document.getElementById('aiQuizBox').style.display='none';
+  document.getElementById('aiActions').style.display='none';
   try{
     let res = await fetch('/.netlify/functions/ai', {
       method:'POST',
@@ -427,11 +458,14 @@ async function callAI(prompt){
     if(!res.ok) throw new Error("AI function not set up yet");
     let data = await res.json();
     let answer = data.answer || data.text || JSON.stringify(data);
+    currentAIText = answer;
     document.getElementById('aiResult').textContent = answer;
+    document.getElementById('aiActions').style.display='flex';
     return answer;
   } catch(e){
     document.getElementById('aiResult').textContent = "⚠️ AI server not connected yet - using Free Mode. To enable real Wave AI, add your GROQ_API_KEY in Netlify. Falling back to live translation + dictionary...";
     let fallback = await translateText("Hello, how are you today? Good luck with your focus.", currentLang);
+    currentAIText = fallback;
     document.getElementById('aiResult').textContent += `\n\nFree Mode - Translation in ${langNames[currentLang]}: ${fallback}\n\nTip: Set up Groq (free) to unlock full AI.`;
     return fallback;
   }
@@ -443,7 +477,10 @@ async function aiAsk(){
 }
 async function aiQuiz(){
   document.getElementById('aiQuizBox').style.display='block';
-  let prompt = `Create ONE beginner language quiz question in ${langNames[currentLang]}. The user is learning ${langNames[currentLang]}. Give a question like "How do you say 'Hello, how are you?' in ${langNames[currentLang]}?" Then give the correct answer on a new line starting with ANSWER: . Keep it simple. Only one question.`;
+  var topics=['animals','food','football','music','gaming','crystals','school','travel','movies','space','family','sports'];
+  var t=topics[Math.floor(Math.random()*topics.length)];
+  var seed=Math.floor(Math.random()*99999);
+  let prompt = `Create ONE beginner language quiz question in ${langNames[currentLang]} about ${t}. Seed ${seed}. The user is learning ${langNames[currentLang]}. Give a question like "How do you say 'Hello, how are you?' in ${langNames[currentLang]}?" Then give the correct answer on a new line starting with ANSWER: . Keep it simple. Only one question. Make it completely different from previous quizzes.`;
   let answer = await callAI(prompt);
   let match = answer.match(/ANSWER:\s*(.+)/i);
   if(match) currentAIQuizAnswer = match[1].trim();
@@ -451,22 +488,37 @@ async function aiQuiz(){
   document.getElementById('aiQuizResult').textContent = "Type your answer above and tap Check Answer. +20 XP if correct!";
 }
 async function aiStory(){
-  await callAI(`Write a 3-sentence story starter about a magical crystal that glows when you focus. Make it mysterious and fun for a teen. End with a cliffhanger.`);
+  var heroes=['a skateboarder','a shy coder','a girl who can hear crystals','a footballer','a time-traveling chef','a robot dog','a street artist','a surfer','a DJ who lost his beats','a girl who can pause time','a boy who collects lightning','a librarian with a secret portal'];
+  var places=['in Tokyo','on a floating island','in a school basement','on Mars','in Trinidad','inside a video game','in a haunted mall','under the ocean','in a library at midnight','on a train that never stops'];
+  var twists=['the crystal glows when you focus','the crystal shows your future','the crystal makes time slow down','the crystal whispers secrets','the crystal swaps your body with someone','the crystal eats memories'];
+  var h=heroes[Math.floor(Math.random()*heroes.length)];
+  var p=places[Math.floor(Math.random()*places.length)];
+  var tw=twists[Math.floor(Math.random()*twists.length)];
+  var seed=Math.floor(Math.random()*99999);
+  await callAI(`Seed ${seed}. Write a 3-sentence story starter about ${h} ${p} who finds a crystal where ${tw}. Mysterious and fun for a teen. End with a cliffhanger. Never use Maya. Never repeat a previous story.`);
 }
 async function aiIdea(){
-  await callAI(`Give me ONE creative business / game / app idea a teen could build. Make it original, fun, and doable in 1 week. Format: Idea: ... Why it works: ... First step: ...`);
+  var categories=['a game for kids who hate homework','an app for sneaker collectors','a business for gamers','a tool for music lovers','an app for pet owners','a game about crystals and focus','a business for football fans','an app for learning languages with friends','a tool for TikTok creators','a game for people who love food','an app for saving money as a teen','a business selling custom phone cases','an app for shy people to make friends','a game about cooking in space','an app for skateboarders','a business for artists'];
+  var pick=categories[Math.floor(Math.random()*categories.length)];
+  var seed=Math.floor(Math.random()*99999);
+  await callAI(`Seed ${seed}. Give me ONE creative business / game / app idea about ${pick}. A teen could build it in 1 week. Make it original and fun. NEVER repeat a previous idea. Format: Idea: ... Why it works: ... First step: ...`);
 }
 async function aiTranslate(){
   let text = document.getElementById('aiInput').value.trim() || "I am focused and I am building my future";
   let translated = await translateText(text, currentLang);
-  document.getElementById('aiResult').textContent = `English: ${text}\n${langNames[currentLang]}: ${translated}\n\n(Translated live via MyMemory API - free, real translation)`;
+  currentAIText = `English: ${text}\n${langNames[currentLang]}: ${translated}`;
+  document.getElementById('aiResult').textContent = currentAIText + `\n\n(Translated live via MyMemory API - free, real translation)`;
+  document.getElementById('aiActions').style.display='flex';
 }
 async function aiMotivate(){
-  await callAI(`Give me a short motivational message for a teen building his own app. Make it hype, real, not cheesy. 2 sentences max.`);
+  var vibes=['grind mode','comeback mode','focus mode','gym mode','study mode','building your app mode','no excuses mode','main character mode','after a bad day mode','early morning mode'];
+  var v=vibes[Math.floor(Math.random()*vibes.length)];
+  var seed=Math.floor(Math.random()*99999);
+  await callAI(`Seed ${seed}. Give me a 2-sentence hype motivation for ${v}. Make it original, not the same old quote. Talk like a cool older brother. Mention Wave Crystal once. Never repeat a previous motivation.`);
 }
 async function aiUseWordInSentence(){
   if(!currentDailyWord) return;
-  await callAI(`Use the word "${currentDailyWord}" in a cool sentence a teen would understand, and also translate that sentence to ${langNames[currentLang]}.`);
+  await callAI(`Use the word "${currentDailyWord}" in a cool sentence a teen would understand, and also translate that sentence to ${langNames[currentLang]}. Seed ${Math.floor(Math.random()*99999)}.`);
 }
 function checkAIQuiz(){
   let userAns = document.getElementById('aiQuizInput').value.toLowerCase().trim();
@@ -496,6 +548,7 @@ window.onload=function(){
   showRitual('icosa');
   updateTimerUI();
   loadDailyWord(false);
+  renderSaved();
 };
 </script>
 </body>
