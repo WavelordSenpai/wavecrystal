@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Wave Crystal V16 - The Crystal Lab</title>
-<link rel="manifest" href="manifest.json?v=16">
+<title>Wave Crystal V17 - The Crystal Lab</title>
+<link rel="manifest" href="manifest.json?v=17">
 <meta name="theme-color" content="#0A0A0A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -118,7 +118,7 @@ body.carry-mode #carryHint{display:block;text-align:center;color:#888;font-size:
   <div id="savedList"></div>
 </div>
 <div id="stage">
-  <div id="top"><span>Wavelord • <b>Wave Crystal V16</b></span><button class="topBarBtn" onclick="openSaved()">💾 Saved (<span id="savedCountTop">0</span>)</button></div>
+  <div id="top"><span>Wavelord • <b>Wave Crystal V17</b></span><button class="topBarBtn" onclick="openSaved()">💾 Saved (<span id="savedCountTop">0</span>)</button></div>
   <div id="title">Wave Crystal<br><span>The Crystal Lab • Now With Real AI.</span></div>
   <p id="sub">Real dictionary. Real translation. Real AI questions. Any language.</p>
   <div id="streakBar">
@@ -226,7 +226,7 @@ body.carry-mode #carryHint{display:block;text-align:center;color:#888;font-size:
     <b id="installTitle">📲 Install Wave Crystal - The Crystal Lab</b>
     <p id="installText">Tap to install - real system popup</p>
   </button>
-  <p id="foot">Wave Crystal - The Crystal Lab V16 by Wavelord • Real Dictionary • Real Translation • Real AI<br>Your progress saves on your phone</p>
+  <p id="foot">Wave Crystal - The Crystal Lab V17 by Wavelord • Real Dictionary • Real Translation • Real AI<br>Your progress saves on your phone</p>
 </div>
 <script>
 var SOLIDS={
@@ -238,6 +238,12 @@ var SOLIDS={
 };
 var currentKey='icosa';
 try{ var savedSolid=localStorage.getItem('waveCrystalSolid'); if(savedSolid && SOLIDS[savedSolid]) currentKey=savedSolid; }catch(e){}
+// --- V17 COMBINED FIX: Make AI work in APK (file:) + on Netlify ---
+var NETLIFY_URL = "https://wavecrystal.netlify.app";
+function getAIFunc(){
+  if(location.protocol === 'file:') return NETLIFY_URL + '/.netlify/functions/ai';
+  return '/.netlify/functions/ai';
+}
 var currentLang='es';
 var langNames={es:'Spanish',it:'Italian',fr:'French',pt:'Portuguese',de:'German',ja:'Japanese',hi:'Hindi',en:'English'};
 var currentAIQuizAnswer='';
@@ -597,7 +603,7 @@ async function callAI(prompt){
   document.getElementById('aiQuizBox').style.display='none';
   document.getElementById('aiActions').style.display='none';
   try{
-    let res = await fetch('/.netlify/functions/ai', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({prompt: prompt}) });
+    let res = await fetch(getAIFunc(), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({prompt: prompt}) });
     if(!res.ok) throw new Error("AI function not set up yet");
     let data = await res.json();
     let answer = data.answer || data.text || JSON.stringify(data);
@@ -668,7 +674,7 @@ async function aiUseWordInSentence(){
   var cleanWord = currentDailyWord.replace(/[^a-zA-Z-]/g,'');
   var langPart = currentLang==='en' ? 'Keep the sentence in English and give 1 pronunciation tip.' : `Then translate that sentence to ${langNames[currentLang]}. Format: Sentence: ...\n${langNames[currentLang]}: ...\nPronunciation: ...`;
   try{
-    let res = await fetch('/.netlify/functions/ai', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({prompt: `Seed ${Math.floor(Math.random()*999999)}. Use the word "${cleanWord}" in 1 cool sentence a teen would understand. ${langPart}`}) });
+    let res = await fetch(getAIFunc(), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({prompt: `Seed ${Math.floor(Math.random()*999999)}. Use the word "${cleanWord}" in 1 cool sentence a teen would understand. ${langPart}`}) });
     let data = await res.json();
     let answer = data.answer || data.text || 'No answer';
     box.textContent = answer;
@@ -700,7 +706,7 @@ async function realInstall(){
   if(isIOS) alert("iPhone:\n1. Tap Share at bottom\n2. Add to Home Screen\n3. Tap Add");
   else alert("Android:\n1. Tap 3 dots top right\n2. Install App / Add to Home Screen\n3. Tap Install");
 }
-if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(function(){}); }
+if('serviceWorker' in navigator && location.protocol !== 'file:'){ navigator.serviceWorker.register('sw.js').catch(function(){}); }
 window.onload=function(){
   init3D();
   var btns=document.querySelectorAll('.solidBtn');
@@ -722,4 +728,4 @@ window.onload=function(){
 };
 </script>
 </body>
-  </html>
+      </html>
