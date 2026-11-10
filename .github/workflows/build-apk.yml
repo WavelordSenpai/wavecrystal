@@ -51,6 +51,12 @@ jobs:
           cp overlay/float_crystal.xml android/app/src/main/res/layout/float_crystal.xml
           cp overlay/bubble_bg.xml android/app/src/main/res/drawable/bubble_bg.xml
 
+      - name: Force fix onResume visibility
+        run: |
+          sed -i 's/protected void onResume/public void onResume/' android/app/src/main/java/com/wavecrystal/app/MainActivity.java
+          sed -i 's/protected void onActivityResult/public void onActivityResult/' android/app/src/main/java/com/wavecrystal/app/MainActivity.java
+          grep -n "onResume\|onActivityResult" android/app/src/main/java/com/wavecrystal/app/MainActivity.java
+
       - name: Add overlay permission to Manifest
         run: |
           MANIFEST=android/app/src/main/AndroidManifest.xml
