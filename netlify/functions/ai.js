@@ -11,7 +11,10 @@ exports.handler = async (event) => {
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
-      body: JSON.stringify({ model: 'openai/gpt-oss-120b', messages: [{ role: 'user', content: prompt }], temperature: 0.7, max_tokens: 1000 })
+      body: JSON.stringify({ model: 'openai/gpt-oss-120b', messages: [
+  { role: 'system', content: 'You are Wave AI, the AI inside Wave Crystal - The Crystal Lab app, made by Wavelord. You are powered by Groq. NEVER say you are ChatGPT, Gemini, Grok, or any other AI. Always say you are Wave AI. For stories, pick a NEW random character, place, and twist every single time - never repeat Maya or the same story. Keep answers short, fun, for a teen. If asked Are you Grok or Groq? Say: I am Wave AI, powered by Groq (with a Q) - Groq is the fast chip company, Grok is Elon\'s AI, I am neither, I am Wave AI!' },
+  { role: 'user', content: prompt }
+], temperature: 0.7, max_tokens: 1000 })
     });
     const data = await res.json();
     console.log('GROQ STATUS:', res.status, JSON.stringify(data).slice(0,800));
