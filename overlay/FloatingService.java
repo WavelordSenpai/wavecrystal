@@ -21,7 +21,7 @@ public class FloatingService extends Service {
     public IBinder onBind(Intent intent) { return null; }
 
     @Override
-    public int onCreate() {
+    public void onCreate() {
         super.onCreate();
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         floatView = LayoutInflater.from(this).inflate(R.layout.float_crystal, null);
@@ -38,19 +38,16 @@ public class FloatingService extends Service {
         params.x = 100;
         params.y = 300;
 
-        // Load the 3D crystal
         WebView web = floatView.findViewById(R.id.crystalWeb);
         web.getSettings().setJavaScriptEnabled(true);
         web.setBackgroundColor(0x00000000);
         web.loadUrl("file:///android_asset/crystal.html");
 
-        // Close button
         View close = floatView.findViewById(R.id.closeBtn);
         if (close != null) {
             close.setOnClickListener(v -> stopSelf());
         }
 
-        // Tap to go back to app
         floatView.setOnClickListener(v -> {
             Intent i = new Intent(this, MainActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_REOPEN_TASK);
@@ -58,7 +55,6 @@ public class FloatingService extends Service {
             stopSelf();
         });
 
-        // Drag it anywhere
         floatView.setOnTouchListener(new View.OnTouchListener() {
             private int lastX, lastY;
             private long downTime;
@@ -80,7 +76,6 @@ public class FloatingService extends Service {
                         lastY = (int) event.getRawY();
                         return true;
                     case MotionEvent.ACTION_UP:
-                        // If it was a quick tap (not a drag), let click fire
                         if (System.currentTimeMillis() - downTime < 200) {
                             v.performClick();
                         }
@@ -91,6 +86,10 @@ public class FloatingService extends Service {
         });
 
         windowManager.addView(floatView, params);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
         return START_NOT_STICKY;
     }
 
