@@ -18,7 +18,7 @@ public class FloatingService extends Service {
     wm = (WindowManager) getSystemService(WINDOW_SERVICE);
     bubble = LayoutInflater.from(this).inflate(R.layout.float_crystal, null);
     int type = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_PHONE;
-    WindowManager.LayoutParams p = new WindowManager.LayoutParams(200, 200, type, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT);
+    WindowManager.LayoutParams p = new WindowManager.LayoutParams(180, 180, type, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT);
     p.x = 0; p.y = 200;
     wm.addView(bubble, p);
     ImageView img = bubble.findViewById(R.id.crystalIcon);
