@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  html,body{margin:0;padding:0;background:transparent;overflow:hidden;width:100%;height:100%}
+  canvas{display:block;background:transparent}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+<script>
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.z = 3.2;
+  const renderer = new THREE.WebGLRenderer({alpha:true, antialias:true});
+  renderer.setSize(300, 300);
+  renderer.setClearColor(0x000000, 0);
+  document.body.appendChild(renderer.domElement);
+
+  // Your platonic solid - Icosahedron
+  const geometry = new THREE.IcosahedronGeometry(1.2, 0);
+  const material = new THREE.MeshPhongMaterial({
+    color: 0x2196F3,
+    shininess: 100,
+    specular: 0x99ccff,
+    flatShading: true,
+    transparent: true,
+    opacity: 0.95
+  });
+  const crystal = new THREE.Mesh(geometry, material);
+  scene.add(crystal);
+
+  // Gold wireframe - your gold edges
+  const edges = new THREE.EdgesGeometry(geometry);
+  const lineMat = new THREE.LineBasicMaterial({ color: 0xFFD700, linewidth: 2 });
+  const wire = new THREE.LineSegments(edges, lineMat);
+  scene.add(wire);
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  const light = new THREE.DirectionalLight(0xffffff, 1.2);
+  light.position.set(2, 3, 4);
+  scene.add(light);
+  const light2 = new THREE.PointLight(0x00ffff, 0.8, 10);
+  light2.position.set(-2, -1, 2);
+  scene.add(light2);
+
+  function animate(){
+    requestAnimationFrame(animate);
+    crystal.rotation.y += 0.01;
+    crystal.rotation.x += 0.005;
+    wire.rotation.copy(crystal.rotation);
+    renderer.render(scene, camera);
+  }
+  animate();
+</script>
+</body>
+</html>
