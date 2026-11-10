@@ -298,6 +298,8 @@ window.onload=function(){ init3D(); showRitual('icosa'); updateTimerUI(); loadDa
     </div>
 <div id="miniBubble" style="display:none; position:fixed; top:100px; left:100px; width:150px; height:150px; z-index:9999;"></div>
 <script>
+var miniDragX = 0, miniDragY = 0, miniStartX = 0, miniStartY = 0, miniMoved = false, miniDragging = false;
+
 function goMini(){
   var shape = localStorage.getItem('wc_shape') || window.currentKey || 'icosa';
   var info = SOLIDS[shape] || SOLIDS['icosa'];
@@ -305,16 +307,47 @@ function goMini(){
   document.getElementById('mainApp').style.display = 'none';
   var b = document.getElementById('miniBubble');
   b.style.display = 'block';
-  b.innerHTML = '<iframe src="bubble.html?shape=' + shape + '&color=' + encodeURIComponent(color) + '" style="width:150px;height:150px;border:0;background:transparent"></iframe>';
-  // tap bubble to come back
-  b.onclick = function(){ goFull(); };
+  b.innerHTML = '<iframe src="bubble.html?shape=' + shape + '&color=' + encodeURIComponent(color) + '" style="width:150px;height:150px;border:0;background:transparent;pointer-events:none"></iframe>';
 }
+
 function goFull(){
   document.getElementById('miniBubble').style.display = 'none';
   document.getElementById('miniBubble').innerHTML = '';
   document.getElementById('mainApp').style.display = 'block';
-  }
+}
 
+(function(){
+  var b = document.getElementById('miniBubble');
+  if(!b) return;
+  b.style.touchAction = 'none';
+  function start(e){
+    miniDragging = true; miniMoved = false;
+    var t = e.touches ? e.touches[0] : e;
+    miniStartX = t.clientX; miniStartY = t.clientY;
+    miniDragX = b.offsetLeft; miniDragY = b.offsetTop;
+  }
+  function move(e){
+    if(!miniDragging) return;
+    var t = e.touches ? e.touches[0] : e;
+    var dx = t.clientX - miniStartX;
+    var dy = t.clientY - miniStartY;
+    if(Math.abs(dx) > 6 || Math.abs(dy) > 6) miniMoved = true;
+    b.style.left = (miniDragX + dx) + 'px';
+    b.style.top = (miniDragY + dy) + 'px';
+    if(e.cancelable) e.preventDefault();
+  }
+  function end(){
+    if(!miniDragging) return;
+    miniDragging = false;
+    if(!miniMoved) goFull();
+  }
+  b.addEventListener('touchstart', start, {passive:true});
+  b.addEventListener('touchmove', move, {passive:false});
+  b.addEventListener('touchend', end);
+  b.addEventListener('mousedown', start);
+  window.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', end);
+})();
 </script>
 </body>
 </html>
