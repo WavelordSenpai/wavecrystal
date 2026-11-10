@@ -26,8 +26,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Sync Capacitor
-        run: npx cap sync android
+      - name: Setup Android project
+        run: |
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
+          npx cap sync android
 
       - name: Copy overlay into Android project
         run: |
