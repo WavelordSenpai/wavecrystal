@@ -50,7 +50,7 @@ public class FloatingService extends Service {
         SharedPreferences prefs = getSharedPreferences("wave", MODE_PRIVATE);
         String shape = prefs.getString("shape", "octa");
         String color = prefs.getString("color", "#FFD700");
-        crystalWeb.loadUrl("file:///android_asset/bubble.html?shape=" + shape + "&color=" + color.replace("#", "%23"));
+        crystalWeb.loadUrl("file:///android_asset/crystal.html?shape=" + shape + "&color=" + color.replace("#", "%23"));
 
         params = new WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
