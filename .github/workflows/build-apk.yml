@@ -3,65 +3,52 @@ name: Build APK
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-      - uses: actions/setup-java@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: 21
-      - name: Install Capacitor
-        run: npm install @capacitor/core @capacitor/cli @capacitor/android typescript
-      - name: Fix Config
-        run: |
-          rm -f capacitor.config.ts
-          printf "const config = {\n  appId: 'com.wavecrystal.app',\n  appName: 'WaveCrystal',\n  webDir: 'www'\n};\nmodule.exports = config;\n" > capacitor.config.js
-      - name: Add Android
-        run: npx cap add android
-      - name: Copy Overlay Files
-        run: |
-          cp overlay/FloatingService.java android/app/src/main/java/com/wavecrystal/app/FloatingService.java
-          cp overlay/MainActivity.java android/app/src/main/java/com/wavecrystal/app/MainActivity.java
-          cp overlay/float_crystal.xml android/app/src/main/res/layout/float_crystal.xml
-      - name: Add Overlay Permissions
-        run: |
-          python3 -c "
-          import pathlib
-          p = pathlib.Path('android/app/src/main/AndroidManifest.xml')
-          t = p.read_text()
-          if 'SYSTEM_ALERT_WINDOW' not in t:
-              t = t.replace('<uses-permission android:name=\"android.permission.INTERNET\" />', '<uses-permission android:name=\"android.permission.INTERNET\" />\n    <uses-permission android:name=\"android.permission.SYSTEM_ALERT_WINDOW\" />\n    <uses-permission android:name=\"android.permission.FOREGROUND_SERVICE\" />')
-          if 'FloatingService' not in t:
-              t = t.replace('</application>', '        <service android:name=\".FloatingService\" android:exported=\"false\" />\n    </application>')
-          p.write_text(t)
-          print('patched')
-          "
-      - name: Create Web Assets
-        run: |
-          mkdir -p www
-          if [ -f index.html ]; then cp index.html www/index.html; fi
-          if [ -f www/index.html ]; then echo "found index.html"; else printf "<html><body><h1>WaveCrystal</h1></body></html>" > www/index.html; fi
-      - name: Sync
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Sync Capacitor
         run: npx cap sync android
-      - name: Fix Duplicate Kotlin
+
+      - name: Copy overlay into Android project
         run: |
-          python3 -c "
-          import pathlib
-          p = pathlib.Path('android/app/build.gradle')
-          t = p.read_text()
-          if 'kotlin-stdlib-jdk7' not in t:
-              t = t.replace('android {', 'configurations.all {\n    exclude group: \"org.jetbrains.kotlin\", module: \"kotlin-stdlib-jdk7\"\n    exclude group: \"org.jetbrains.kotlin\", module: \"kotlin-stdlib-jdk8\"\n}\n\nandroid {')
-              p.write_text(t)
-          print('kotlin fix done')
-          "
+          mkdir -p android/app/src/main/java/com/wavecrystal/app
+          mkdir -p android/app/src/main/res/layout
+          mkdir -p android/app/src/main/res/drawable
+          cp overlay/FloatingService.java android/app/src/main/java/com/wavecrystal/app/
+          cp overlay/MainActivity.java android/app/src/main/java/com/wavecrystal/app/
+          cp overlay/float_crystal.xml android/app/src/main/res/layout/
+          cp overlay/bubble_bg.xml android/app/src/main/res/drawable/
+          cp icon.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
       - name: Build APK
-        run: cd android && chmod +x gradlew && ./gradlew assembleDebug
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
