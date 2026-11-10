@@ -18,11 +18,7 @@
 var shape = 'icosahedron';
 try { shape = localStorage.getItem('wave_shape') || 'icosahedron'; } catch(e){}
 var colorHex = 0x00C896;
-try {
-  var c = localStorage.getItem('wave_color');
-  if(c) colorHex = parseInt(c);
-} catch(e){}
-
+try { var c = localStorage.getItem('wave_color'); if(c) colorHex = parseInt(c); } catch(e){}
 if (typeof THREE === 'undefined') {
   document.getElementById('c').style.display = 'none';
   document.getElementById('fallback').style.display = 'block';
@@ -32,30 +28,21 @@ if (typeof THREE === 'undefined') {
   camera.position.z = 4.2;
   var renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), alpha: true, antialias: true });
   renderer.setSize(150, 150);
-
   var light1 = new THREE.PointLight(0xffffff, 1.2);
   light1.position.set(3, 3, 3);
   scene.add(light1);
-  var light2 = new THREE.PointLight(0xD4AF37, 0.8);
-  light2.position.set(-3, -2, 2);
-  scene.add(light2);
   scene.add(new THREE.AmbientLight(0x888888, 1.2));
-
   var geo;
   if (shape === 'tetra') geo = new THREE.TetrahedronGeometry(1.5, 0);
   else if (shape === 'cube') geo = new THREE.BoxGeometry(1.9, 1.9, 1.9);
   else if (shape === 'octahedron') geo = new THREE.OctahedronGeometry(1.6, 0);
   else if (shape === 'dodecahedron') geo = new THREE.DodecahedronGeometry(1.5, 0);
   else geo = new THREE.IcosahedronGeometry(1.5, 0);
-
   var mat = new THREE.MeshStandardMaterial({ color: colorHex, metalness: 0.85, roughness: 0.25, flatShading: true });
   var mesh = new THREE.Mesh(geo, mat);
   var line = new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({ color: 0xD4AF37 }));
   var group = new THREE.Group();
-  group.add(mesh);
-  group.add(line);
-  scene.add(group);
-
+  group.add(mesh); group.add(line); scene.add(group);
   function animate() {
     requestAnimationFrame(animate);
     group.rotation.y += 0.01;
