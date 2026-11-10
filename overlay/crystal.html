@@ -6,7 +6,7 @@
 <script>
 var p = new URLSearchParams(location.search);
 var shape = p.get('shape') || 'icosa';
-var SOLIDS = {tetra:{color:0xFF6B00},cube:{color:0xD4AF37},octa:{color:0x00F0FF},dodeca:{color:0xB537F2},icosa:{color:0x00C896}};
+var SOLIDS = {tetra:{color:0xE9B44C},cube:{color:0x1A1210},octa:{color:0x4CAF7D},dodeca:{color:0x7C5CBF},icosa:{color:0xE8833A}};
 var colorHex = SOLIDS[shape] ? SOLIDS[shape].color : 0x00C896;
 var cParam = p.get('color');
 if(cParam){ try{ colorHex = parseInt(cParam.replace('#',''),16); }catch(e){} }
