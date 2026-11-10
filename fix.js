@@ -1,3 +1,13 @@
+// Make onload safe - one crash can't kill everything
+window.addEventListener('load', ()=>{
+  setTimeout(()=>{
+    try{ if(typeof init3D==='function') init3D(); }catch(e){ console.log('3D failed, using fallback'); }
+    try{ if(typeof showRitual==='function') showRitual('icosa'); }catch(e){}
+    try{ if(typeof updateTimerUI==='function') updateTimerUI(); }catch(e){}
+    try{ if(typeof loadDailyWord==='function') loadDailyWord(false); }catch(e){}
+    try{ if(typeof renderSaved==='function') renderSaved(); }catch(e){}
+  },100);
+});
 // FIX: unblock touches + crystal fallback + dictionary fallback
 document.addEventListener('DOMContentLoaded', ()=>{
   // 1. Unblock touches - any fullscreen overlay covering buttons gets disabled
