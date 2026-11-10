@@ -46,10 +46,14 @@ jobs:
         run: |
           mkdir -p android/app/src/main/java/com/wavecrystal/app
           mkdir -p android/app/src/main/res/drawable
+          mkdir -p android/app/src/main/res/layout
+          mkdir -p android/app/src/main/assets
           cp overlay/FloatingService.java android/app/src/main/java/com/wavecrystal/app/FloatingService.java
           cp overlay/MainActivity.java android/app/src/main/java/com/wavecrystal/app/MainActivity.java
           cp overlay/float_crystal.xml android/app/src/main/res/layout/float_crystal.xml
           cp overlay/bubble_bg.xml android/app/src/main/res/drawable/bubble_bg.xml
+          cp overlay/platonic_crystal.xml android/app/src/main/res/drawable/platonic_crystal.xml
+          cp overlay/crystal.html android/app/src/main/assets/crystal.html
 
       - name: Force fix onResume visibility
         run: |
