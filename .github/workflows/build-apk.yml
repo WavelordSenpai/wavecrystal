@@ -26,6 +26,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Prepare web files
+        run: |
+          mkdir -p www
+          cp index.html www/ 2>/dev/null || true
+          cp manifest.json www/ 2>/dev/null || true
+          cp sw.js www/ 2>/dev/null || true
+          cp icon.png www/ 2>/dev/null || true
+
       - name: Setup Android project
         run: |
           if [ ! -d "android" ]; then
