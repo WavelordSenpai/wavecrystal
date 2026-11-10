@@ -27,6 +27,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Create www folder
+        run: |
+          mkdir -p www
+          cp index.html www/index.html
+          cp manifest.json www/manifest.json || true
+          cp sw.js www/sw.js || true
+          cp icon.png www/icon.png || true
+
       - name: Add Android platform if needed
         run: |
           if [ ! -d "android" ]; then
