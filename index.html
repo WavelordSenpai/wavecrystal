@@ -271,42 +271,70 @@ async function loadDailyWord(forceNew){
   var metaEl=document.getElementById('dailyWordMeta');
   document.getElementById('dailyWordTrans').textContent='';
   document.getElementById('wordSentenceBox').style.display='none';
-  wordEl.textContent='⏳ Loading new word...';
+  wordEl.textContent='⏳ AI is picking a word...';
   defEl.textContent='';
   exEl.textContent='';
   metaEl.textContent='';
-  var word='';
   try{
-    var wr=await fetch('https://random-word-api.herokuapp.com/word?number=1');
-    var wa=await wr.json();
-    word=wa[0];
+    let res = await fetch('https://wavecrystal.netlify.app/.netlify/functions/ai', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({prompt: `Seed ${Math.floor(Math.random()*999999)}. Give me ONE cool, rare, hype English word a teen would love. Return ONLY JSON like this: {"word":"...","definition":"1 simple line","example":"1 cool sentence using it","pronunciation":"easy to read"}`})
+    });
+    let data = await res.json();
+    let answer = data.answer || data.text || '';
+    answer = answer.replace(/```json|```/g,'').trim();
+    let j = JSON.parse(answer);
+    currentDailyWord = j.word;
+    currentDailyDef = j.definition;
+    wordEl.textContent = j.word.charAt(0).toUpperCase()+j.word.slice(1);
+    defEl.textContent = j.definition;
+    exEl.textContent = j.example ? '"'+j.example+'"' : '';
+    metaEl.textContent = (j.pronunciation ? 'Pronunciation: '+j.pronunciation+' • ' : '') + 'Source: Wave AI • Powered by Groq';
   }catch(e){
-    word=WORD_BANK[Math.floor(Math.random()*WORD_BANK.length)];
+    var word = WORD_BANK[Math.floor(Math.random()*WORD_BANK.length)];
+    currentDailyWord = word;
+    wordEl.textContent = word.charAt(0).toUpperCase()+word.slice(1);
+    defEl.textContent = 'Tap "AI: Use In Sentence" to get the definition from Wave AI.';
+    metaEl.textContent = 'Source: Wave AI • Powered by Groq';
   }
-  currentDailyWord=word;
-  try{
-    let res=await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+word);
-    let data=await res.json();
-    let entry=data[0];
-    let meaning=entry.meanings[0];
-    let def=meaning.definitions[0];
-    currentDailyDef='('+meaning.partOfSpeech+') '+def.definition;
-    wordEl.textContent=word.charAt(0).toUpperCase()+word.slice(1);
-    defEl.textContent=currentDailyDef;
-    exEl.textContent=def.example ? '"'+def.example+'"' : '';
-    metaEl.textContent=entry.phonetic ? 'Pronunciation: '+entry.phonetic+' • Source: Free Dictionary API' : 'Source: Free Dictionary API';
-  }catch(e){
-    wordEl.textContent=word.charAt(0).toUpperCase()+word.slice(1);
-    defEl.textContent='Could not load definition for this new word. Tap New Word to try another.';
-    metaEl.textContent='Source: Free Dictionary API';
   }
-}
 var LANG_VOICE = {es:'es-ES', it:'it-IT', fr:'fr-FR', pt:'pt-PT', de:'de-DE', ja:'ja-JP', hi:'hi-IN', en:'en-US'};
 function speakWord(){ if(!currentDailyWord) return; speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(currentDailyWord); u.lang = LANG_VOICE[currentLang] || 'en-US'; u.rate = 0.9; speechSynthesis.speak(u);}
 function speakAI(){ if(!currentAIText){ alert('Generate an AI answer first, then tap Speak'); return; } speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(currentAIText.slice(0,300)); u.lang = LANG_VOICE[currentLang] || 'en-US'; u.rate = 0.95; speechSynthesis.speak(u);}
-async function translateDailyWord(){ if(!currentDailyWord) return; if(currentLang==='en'){ document.getElementById('dailyWordTrans').textContent = 'Already in English - pick another language above to translate it.'; return; } document.getElementById('dailyWordTrans').textContent = 'Translating...'; let translated = await translateText(currentDailyWord, currentLang); document.getElementById('dailyWordTrans').textContent = `${langNames[currentLang]}: ${translated}`;}
-async function translateText(text, toLang){ if(toLang==='en') return text; try{ let res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${toLang}`); let data = await res.json(); return data.responseData.translatedText; } catch(e){ return "[translation failed - check internet]"; }}
-function setLang(lang, el){ currentLang=lang; document.querySelectorAll('.langBtn').forEach(b=>b.classList.remove('active')); if(el) el.classList.add('active'); document.getElementById('aiDesc').textContent = `Language set to ${langNames[lang]}. AI will now quiz you in ${langNames[lang]}.`; document.getElementById('dailyWordTrans').textContent='';}
+async function translateDailyWord(){
+  if(!currentDailyWord) return;
+  if(currentLang==='en'){
+    document.getElementById('dailyWordTrans').textContent = 'Already in English - pick another language above to translate it.';
+    return;
+  }
+  document.getElementById('dailyWordTrans').textContent = 'Translating with Wave AI...';
+  let answer = await callAI(`Translate the word "${currentDailyWord}" (${currentDailyDef}) to ${langNames[currentLang]}. Format EXACTLY like this:\n${langNames[currentLang]}: [translation]\nPronunciation: [how to say it]\nExample: [1 short sentence in ${langNames[currentLang]}]`);
+  document.getElementById('dailyWordTrans').textContent = answer;
+}
+
+async function translateText(text, toLang){
+  if(toLang==='en') return text;
+  try{
+    let res = await fetch('https://wavecrystal.netlify.app/.netlify/functions/ai', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({prompt: `Translate this to ${langNames[toLang]}. Return ONLY the translation, no extra words: "${text}"`})
+    });
+    let data = await res.json();
+    return (data.answer || data.text || text).trim();
+  } catch(e){
+    return text;
+  }
+
+
+function setLang(lang, el){
+  currentLang=lang;
+  document.querySelectorAll('.langBtn').forEach(b=>b.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.getElementById('aiDesc').textContent = `Language set to ${langNames[lang]}. AI will now quiz you in ${langNames[lang]}.`;
+  document.getElementById('dailyWordTrans').textContent='';
+}
   function openSaved(){ renderSaved(); document.getElementById('savedDrawer').classList.add('open'); document.getElementById('savedOverlay').classList.add('show'); }
 function closeSaved(){ document.getElementById('savedDrawer').classList.remove('open'); document.getElementById('savedOverlay').classList.remove('show'); }
 function getSavedIdeas(){ try{ return JSON.parse(localStorage.getItem('waveSavedIdeas')||'[]'); }catch(e){ return []; } }
