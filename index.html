@@ -107,6 +107,7 @@ body.bubble-mode{background:#0A0A0A !important}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
+  <div id="mainApp">
 <div id="savedOverlay" onclick="closeSaved()"></div>
 <div id="savedDrawer">
   <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="color:#D4AF37">💾 My Saved Ideas <span id="savedCount" class="badge">0</span></h3><button class="btn small" onclick="closeSaved()">✕ Close</button></div>
@@ -215,7 +216,7 @@ body.bubble-mode{background:#0A0A0A !important}
   <p id="foot">Wave Crystal - The Crystal Lab V8 by Wavelord • Real Dictionary • Real Translation • Real AI<br>Your progress saves on your phone</p>
 </div>
 <div id="bubble" onclick="expandApp()"><div id="bubbleBox"></div><div id="bubbleLabel">TAP TO OPEN</div></div>
-<button id="carryBtn" onclick="minimizeToBubble()">✦ CARRY ME - MINIMIZE</button>
+<button id="carryBtn" onclick="goMini()">✦ CARRY ME - MINIMIZE</button>
 <script>
 var SOLIDS={  tetra:{name:"Tetrahedron - Sprint / Fire", desc:"4 faces • Fire • 15 min sprint. For: homework, quick tasks, beating procrastination.", mode:"Sprint Mode • Tetrahedron • 15 min", minutes:15, emoji:"🔺", color:0xFF6B00, label:"TETRAHEDRON • TAP ME", ritual:{title:"🔺 Tetrahedron - Sprint Ritual", text:"Set ONE tiny goal. Example: 'Write 1 paragraph'. Set timer 15 min. No perfection. Just speed. Go!"},    features:[], checklist:["Pick ONE tiny goal","Close all other tabs","Phone face down","Start 15 min sprint","No perfection, just speed"]},  cube:{name:"Cube - Routine / Earth", desc:"6 faces • Earth • 60 min routine. For: mornings, habits, structure.", mode:"Routine Mode • Cube • 60 min", minutes:60, emoji:"⬛", color:0xD4AF37, label:"CUBE • TAP ME", ritual:{title:"⬛ Cube - Routine Ritual", text:"Cube is structure. Do in order: Water -> Stretch -> 1 habit -> Work. No skipping."},    features:[], checklist:["Drink water","Make bed / tidy","Stretch 1 min","Write Top 3 goals","Start first task"]},  octa:{name:"Octahedron - Balance / Air", desc:"8 faces • Air • 10 min balance. For: stress, anxiety, reset.", mode:"Balance Mode • Octahedron • 10 min", minutes:10, emoji:"◆", color:0x00F0FF, label:"OCTAHEDRON • TAP ME", ritual:{title:"◆ Octahedron - Balance Ritual", text:"Stop. Feet on floor. Breathe in 4, hold 4, out 6. Do 3 rounds."},    features:[], checklist:["Feet on floor","Breathe 4-4-6 x3","Unclench jaw","Drop shoulders","Ask: Am I balanced?"]},  dodeca:{name:"Dodecahedron - Ideas / Universe", desc:"12 faces • Universe • 45 min creativity. For: brainstorming, writing, art.", mode:"Creativity Mode • Dodecahedron • 45 min", minutes:45, emoji:"⬣", color:0xB537F2, label:"DODECAHEDRON • TAP ME", ritual:{title:"⬣ Dodecahedron - Idea Ritual", text:"No judging ideas yet. Write 10 bad ideas. Bad ideas lead to good ones."},    features:[], checklist:["No judging yet","Write 10 bad ideas","Pick 1 favorite","Expand it 3 lines","Save it for later"]},  icosa:{name:"Icosahedron - Flow / Water", desc:"20 faces • Water • 25 min flow. For: deep work, studying, coding.", mode:"Flow Mode • Icosahedron • 25 min", minutes:25, emoji:"⬢", color:0x00C896, label:"ICOSAHEDRON • TAP ME", ritual:{title:"⬢ Icosahedron - Flow Ritual", text:"Headphones on. One tab only. Phone away. Tell yourself: 'I am in flow now.'"},    features:[], checklist:["Headphones on","One tab only","Phone away","One task only","Stay 20+ min for flow"]}};
 var currentKey='icosa';var currentFeatureIndex=0;var currentLang='es';var langNames={es:'Spanish',it:'Italian',fr:'French',pt:'Portuguese',de:'German',ja:'Japanese',hi:'Hindi',en:'English'};var currentAIQuizAnswer='';var currentDailyWord='';var currentDailyDef='';var currentAIText='';var scene, camera, renderer, currentMesh=null;
@@ -293,6 +294,27 @@ var deferredPrompt=null;window.addEventListener('beforeinstallprompt', function(
 async function realInstall(){ if(deferredPrompt){ deferredPrompt.prompt(); let c=await deferredPrompt.userChoice; if(c.outcome==='accepted') document.getElementById('installTitle').textContent="✅ Installing..."; deferredPrompt=null; return; } var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent); if(isIOS) alert("iPhone:\n1. Tap Share at bottom\n2. Add to Home Screen\n3. Tap Add"); else alert("Android:\n1. Tap 3 dots top right\n2. Install App / Add to Home Screen\n3. Tap Install");}
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(function(){}); }
 window.onload=function(){ init3D(); showRitual('icosa'); updateTimerUI(); loadDailyWord(false); renderSaved();};
+</script>
+    </div>
+<div id="miniBubble" style="display:none; position:fixed; top:100px; left:100px; width:150px; height:150px; z-index:9999;"></div>
+<script>
+function goMini(){
+  var shape = localStorage.getItem('wc_shape') || window.currentKey || 'icosa';
+  var info = SOLIDS[shape] || SOLIDS['icosa'];
+  var color = '#' + info.color.toString(16).padStart(6,'0');
+  document.getElementById('mainApp').style.display = 'none';
+  var b = document.getElementById('miniBubble');
+  b.style.display = 'block';
+  b.innerHTML = '<iframe src="bubble.html?shape=' + shape + '&color=' + encodeURIComponent(color) + '" style="width:150px;height:150px;border:0;background:transparent"></iframe>';
+  // tap bubble to come back
+  b.onclick = function(){ goFull(); };
+}
+function goFull(){
+  document.getElementById('miniBubble').style.display = 'none';
+  document.getElementById('miniBubble').innerHTML = '';
+  document.getElementById('mainApp').style.display = 'block';
+  }
+
 </script>
 </body>
 </html>
