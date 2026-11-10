@@ -30,11 +30,11 @@ public class MainActivity extends BridgeActivity {
         }
         @JavascriptInterface
         public void setShape(String shape) {
-            getSharedPreferences("wave", MODE_PRIVATE).edit().putString("wave_shape", shape).apply();
+            getSharedPreferences("wave", MODE_PRIVATE).edit().putString("shape", shape).apply();
         }
         @JavascriptInterface
         public void setColor(String color) {
-            getSharedPreferences("wave", MODE_PRIVATE).edit().putString("wave_color", color).apply();
+            getSharedPreferences("wave", MODE_PRIVATE).edit().putString("color", color).apply();
         }
     }
 
