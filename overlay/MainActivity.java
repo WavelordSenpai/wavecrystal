@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.webkit.JavascriptInterface;
-
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
@@ -14,7 +13,6 @@ public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // ONLY ask permission, DO NOT start bubble here
         if (!Settings.canDrawOverlays(this)) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                 Uri.parse("package:" + getPackageName()));
@@ -29,42 +27,37 @@ public class MainActivity extends BridgeActivity {
             getSharedPreferences("wave", MODE_PRIVATE).edit().putBoolean("mini", true).apply();
             moveTaskToBack(true);
         }
+        @JavascriptInterface
+        public void setShape(String shape) {
+            getSharedPreferences("wave", MODE_PRIVATE).edit().putString("wave_shape", shape).apply();
+        }
+        @JavascriptInterface
+        public void setColor(String color) {
+            getSharedPreferences("wave", MODE_PRIVATE).edit().putString("wave_color", color).apply();
+        }
     }
 
     private void startFloatingService() {
-        Intent intent = new Intent(this, FloatingService.class);
-        startService(intent);
+        startService(new Intent(this, FloatingService.class));
     }
-
     private void stopFloatingService() {
-        Intent intent = new Intent(this, FloatingService.class);
-        stopService(intent);
+        stopService(new Intent(this, FloatingService.class));
     }
-
     private boolean isMiniMode() {
         return getSharedPreferences("wave", MODE_PRIVATE).getBoolean("mini", false);
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        // App is open = HIDE bubble always
         stopFloatingService();
         getSharedPreferences("wave", MODE_PRIVATE).edit().putBoolean("mini", false).apply();
-        try {
-            getBridge().getWebView().addJavascriptInterface(new MiniBridge(), "AndroidMini");
-        } catch (Exception e) {}
+        try { getBridge().getWebView().addJavascriptInterface(new MiniBridge(), "AndroidMini"); } catch (Exception e) {}
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        // ONLY show bubble IF user tapped Mini
         if (isMiniMode() && Settings.canDrawOverlays(this)) {
             startFloatingService();
         }
