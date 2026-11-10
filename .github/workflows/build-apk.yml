@@ -50,6 +50,13 @@ jobs:
           cp overlay/float_crystal.xml android/app/src/main/res/layout/float_crystal.xml
           cp overlay/bubble_bg.xml android/app/src/main/res/layout/bubble_bg.xml
 
+      - name: Add overlay permission to Manifest
+        run: |
+          MANIFEST=android/app/src/main/AndroidManifest.xml
+          grep -q SYSTEM_ALERT_WINDOW $MANIFEST || sed -i 's|<uses-permission android:name="android.permission.INTERNET" />|<uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />|' $MANIFEST
+          grep -q FloatingService $MANIFEST || sed -i 's|</application>|        <service android:name=".FloatingService" android:exported="false" />\n    </application>|' $MANIFEST
+          cat $MANIFEST
+
       - name: Build APK
         run: |
           cd android
