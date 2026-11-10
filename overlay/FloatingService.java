@@ -1,4 +1,4 @@
-package com.wavecrystal.app.overlay;
+package com.wavecrystal.app;
 
 import android.app.Service;
 import android.content.Intent;
@@ -11,9 +11,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebView;
-
-import com.wavecrystal.app.MainActivity;
-import com.wavecrystal.app.R;
 
 public class FloatingService extends Service {
 
@@ -41,10 +38,8 @@ public class FloatingService extends Service {
         params.x = 100;
         params.y = 400;
 
-        // --- WHICH SOLID DID YOU LEAVE IT ON? ---
         String solid = getSharedPreferences("wave", MODE_PRIVATE).getString("selected_solid", "icosahedron");
 
-        // --- THE LIVE ANIMATION ITSELF, NOT A PICTURE ---
         WebView web = bubble.findViewById(R.id.crystalWeb);
         web.getSettings().setJavaScriptEnabled(true);
         web.setBackgroundColor(Color.TRANSPARENT);
@@ -78,7 +73,6 @@ public class FloatingService extends Service {
 
         web.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
 
-        // --- DRAG vs TAP ---
         final float[] downPos = new float[2];
         final int[] downParams = new int[2];
         final boolean[] moved = {false};
