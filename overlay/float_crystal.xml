@@ -23,5 +23,4 @@
         android:text="✕"
         android:textColor="#FFFFFF"
         android:textSize="14sp" />
-
 </FrameLayout>
