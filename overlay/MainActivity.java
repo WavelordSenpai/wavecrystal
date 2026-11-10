@@ -32,7 +32,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == OVERLAY_REQUEST) {
             if (Settings.canDrawOverlays(this)) {
@@ -42,7 +42,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (Settings.canDrawOverlays(this)) {
             startFloatingService();
