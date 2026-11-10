@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="64dp"
-    android:layout_height="64dp">
-    <ImageView
-        android:id="@+id/crystalIcon"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:src="@mipmap/ic_launcher"
-        android:background="@drawable/bubble_bg"
-        android:contentDescription="Wave Crystal" />
+    android:layout_width="90dp"
+    android:layout_height="90dp">
+    <WebView
+        android:id="@+id/crystalWeb"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:background="@android:color/transparent" />
 </FrameLayout>
