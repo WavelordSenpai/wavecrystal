@@ -301,6 +301,14 @@ window.onload=function(){ init3D(); showRitual('icosa'); updateTimerUI(); loadDa
 var miniDragX = 0, miniDragY = 0, miniStartX = 0, miniStartY = 0, miniMoved = false, miniDragging = false;
 
 function goMini(){
+  // If we're in the real APK, let Android do the system overlay
+  if(window.AndroidMini && window.AndroidMini.enableMini){
+    try{ localStorage.setItem('wc_shape', window.currentKey || 'icosa'); }catch(e){}
+    try{ window.AndroidMini.setShape(window.currentKey || 'icosa'); }catch(e){}
+    window.AndroidMini.enableMini();
+    return;
+  }
+  // Otherwise - Netlify demo bubble
   var shape = localStorage.getItem('wc_shape') || window.currentKey || 'icosa';
   var info = SOLIDS[shape] || SOLIDS['icosa'];
   var color = '#' + info.color.toString(16).padStart(6,'0');
@@ -308,7 +316,7 @@ function goMini(){
   var b = document.getElementById('miniBubble');
   b.style.display = 'block';
   b.innerHTML = '<iframe src="bubble.html?shape=' + shape + '&color=' + encodeURIComponent(color) + '" style="width:150px;height:150px;border:0;background:transparent;pointer-events:none"></iframe>';
-}
+  }
 
 function goFull(){
   document.getElementById('miniBubble').style.display = 'none';
