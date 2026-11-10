@@ -51,7 +51,6 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
 #card{width:100%;max-width:520px;margin-top:14px;background:#141414;border:1px solid #232323;border-radius:20px;padding:18px}
 #card h3{font-size:17px}
 #card p{font-size:14px;color:#CFC8B8;line-height:1.6;margin-top:8px}
-#cardAction{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
 .btn{padding:10px 16px;border-radius:999px;border:1px solid #333;background:#1E1E1E;color:#fff;font-size:12px;font-weight:700;cursor:pointer}
 .btn.gold{background:#D4AF37;color:#000;border-color:#D4AF37}
 .btn.small{padding:7px 12px;font-size:11px}
@@ -68,32 +67,35 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
 .langBtn.active{background:#D4AF37;color:#000;border-color:#D4AF37}
 #aiInput{width:100%;padding:12px;border-radius:12px;border:1px solid #333;background:#000;color:#fff;font-size:14px;margin-top:10px}
 #aiResult{margin-top:10px;font-size:13px;line-height:1.6;color:#E8E0C8;white-space:pre-wrap}
-#savedBox{width:100%;max-width:520px;margin-top:14px;background:#141414;border:1px solid #232323;border-radius:20px;padding:18px}
-#savedBox h3{font-size:15px;color:#D4AF37}
-.savedItem{background:#0F0F0F;border:1px solid #222;border-radius:12px;padding:12px;margin-top:10px;font-size:12px;line-height:1.6;white-space:pre-wrap}
-.savedItem button{margin-top:8px}
 #dailyWordCard{width:100%;max-width:520px;margin-top:14px;background:#141414;border:1px solid #232323;border-radius:20px;padding:18px}
 #dailyWordCard h3{font-size:15px;color:#D4AF37}
 #dailyWordCard h2{font-size:26px;margin-top:6px}
 #dailyWordCard p{font-size:13px;color:#CFC8B8;line-height:1.6;margin-top:6px}
 #dailyWordCard small{color:#888}
-#grid{width:100%;max-width:520px;margin-top:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.tile{background:#141414;border:1px solid #232323;border-radius:16px;padding:13px 8px;text-align:center;cursor:pointer}
-.tile.active{background:#1A1505;border-color:#D4AF37}
-.tile span{font-size:21px;display:block}
-.tile b{font-size:11px;display:block;margin-top:5px}
-.tile small{font-size:10px;color:#888}
 #installReal{width:100%;max-width:520px;margin-top:14px;background:#D4AF37;color:#000;border-radius:16px;padding:14px;text-align:center;cursor:pointer;border:none}
 #installReal b{font-size:14px}
 #installReal p{font-size:11px;margin-top:4px;opacity:.7}
 #foot{margin-top:14px;font-size:11px;color:#666;text-align:center;line-height:1.5}
 .badge{display:inline-block;background:#D4AF37;color:#000;font-size:9px;font-weight:900;padding:3px 8px;border-radius:999px;margin-left:6px;vertical-align:middle}
+#savedDrawer{position:fixed;top:0;right:-100%;width:92%;max-width:420px;height:100%;background:#111;border-left:2px solid #D4AF37;z-index:99;transition:right .3s;overflow-y:auto;padding:18px}
+#savedDrawer.open{right:0}
+#savedOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:98;display:none}
+#savedOverlay.show{display:block}
+.savedItem{background:#0F0F0F;border:1px solid #222;border-radius:12px;padding:12px;margin-top:10px;font-size:12px;line-height:1.6;white-space:pre-wrap}
+.topBarBtn{background:#D4AF37;color:#000;border:none;padding:8px 12px;border-radius:999px;font-size:11px;font-weight:900;cursor:pointer}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
+<div id="savedOverlay" onclick="closeSaved()"></div>
+<div id="savedDrawer">
+  <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="color:#D4AF37">💾 My Saved Ideas <span id="savedCount" class="badge">0</span></h3><button class="btn small" onclick="closeSaved()">✕ Close</button></div>
+  <p style="font-size:12px;color:#A8A090;margin-top:8px">Tap Save This Idea on any AI answer to keep it here.</p>
+  <button class="btn small" onclick="clearSaved()" style="margin-top:10px">🗑 Clear All</button>
+  <div id="savedList"></div>
+</div>
 <div id="stage">
-  <div id="top"><span>Wavelord • <b>Wave Crystal - The Crystal Lab</b></span><span>V7 • REAL AI</span></div>
+  <div id="top"><span>Wavelord • <b>Wave Crystal</b></span><button class="topBarBtn" onclick="openSaved()">💾 Saved (<span id="savedCountTop">0</span>)</button></div>
   <div id="title">Wave Crystal<br><span>The Crystal Lab • Now With Real AI.</span></div>
   <p id="sub">Real dictionary. Real translation. Real AI questions. Any language.</p>
   <div id="streakBar">
@@ -136,11 +138,13 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
     <p id="dailyWordDef">Fetching real definition from dictionary...</p>
     <p id="dailyWordEx" style="color:#D4AF37;font-style:italic"></p>
     <small id="dailyWordMeta"></small><br>
+    <p id="dailyWordTrans" style="color:#D4AF37;font-size:12px;margin-top:6px"></p>
     <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
       <button class="btn small" onclick="speakWord()">🔊 Pronounce</button>
       <button class="btn small" onclick="translateDailyWord()">🌍 Translate Word</button>
       <button class="btn small gold" onclick="aiUseWordInSentence()">🤖 AI: Use In Sentence</button>
     </div>
+    <div id="wordSentenceBox" style="display:none;margin-top:12px;background:#0F0F0F;border:1px solid #D4AF37;border-radius:12px;padding:12px;font-size:13px;line-height:1.6;white-space:pre-wrap"></div>
   </div>
   <div id="aiBox">
     <h3>🤖 Wave AI <span>• Powered by Groq</span></h3>
@@ -179,74 +183,29 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
       <p id="aiQuizResult" style="font-size:12px;margin-top:8px;color:#D4AF37"></p>
     </div>
   </div>
-  <div id="savedBox">
-    <h3>💾 My Saved Ideas <span id="savedCount" class="badge">0</span> <button class="btn small" onclick="clearSaved()" style="float:right">Clear All</button></h3>
-    <p style="font-size:12px;color:#A8A090;margin-top:6px">Tap Save This Idea on any AI answer to keep it here forever, even after you close the app.</p>
-    <div id="savedList"><p style="font-size:12px;color:#888;margin-top:10px">No saved ideas yet. Generate an idea and tap Save.</p></div>
-  </div>
   <div id="card">
     <h3 id="cardTitle">⬢ Icosahedron - Flow Ritual</h3>
     <p id="cardText">Headphones on. One tab only. No phone. Let the flow take you.</p>
     <div id="checkList"></div>
-    <div id="cardAction">
-      <button class="btn gold" onclick="doCrystalAction()">✨ Do Crystal Ritual</button>
-      <button class="btn" onclick="showNextFeature()">↻ Next Idea</button>
-    </div>
   </div>
-  <div id="grid"></div>
   <button id="installReal" onclick="realInstall()">
     <b id="installTitle">📲 Install Wave Crystal - The Crystal Lab</b>
     <p id="installText">Tap to install - real system popup</p>
   </button>
-  <p id="foot">Wave Crystal - The Crystal Lab V7 by Wavelord • Real Dictionary • Real Translation • Real AI<br>Your progress saves on your phone</p>
+  <p id="foot">Wave Crystal - The Crystal Lab V8 by Wavelord • Real Dictionary • Real Translation • Real AI<br>Your progress saves on your phone</p>
 </div>
 <script>
 var SOLIDS={
   tetra:{name:"Tetrahedron - Sprint / Fire", desc:"4 faces • Fire • 15 min sprint. For: homework, quick tasks, beating procrastination.", mode:"Sprint Mode • Tetrahedron • 15 min", minutes:15, emoji:"🔺", color:0xFF6B00, label:"TETRAHEDRON • TAP ME", ritual:{title:"🔺 Tetrahedron - Sprint Ritual", text:"Set ONE tiny goal. Example: 'Write 1 paragraph'. Set timer 15 min. No perfection. Just speed. Go!"},
-    features:[
-      {id:"sprint", icon:"🔥", label:"Sprint", sub:"15 min blast", title:"🔥 Sprint Blast", text:"One task. One timer. No checking phone. If you get distracted, write it down and keep going."},
-      {id:"distract", icon:"🚫", label:"Kill Distraction", sub:"Block list", title:"🚫 Distraction Killer", text:"Close all tabs except 1. Phone face down. Tell yourself: 'I can scroll AFTER this sprint.'"},
-      {id:"tiny", icon:"🎯", label:"Tiny Goal", sub:"1 small win", title:"🎯 Tiny Goal", text:"Don't say 'do homework'. Say 'do 1 question'. Small wins build momentum."},
-      {id:"energy", icon:"⚡", label:"Energy", sub:"Jump + water", title:"⚡ Energy Boost", text:"10 jumping jacks, drink water, shake hands. Fire needs fuel."},
-      {id:"reward", icon:"🏆", label:"Reward", sub:"Earn break", title:"🏆 Earn Your Break", text:"Finish sprint? You earned 5 min scrolling / snack / game. No guilt."},
-      {id:"language", icon:"🌍", label:"Language Sprint", sub:"AI Quiz", title:"🌍 Language Sprint - AI", text:"Tap AI Quiz below - it will make you a NEW quiz in your chosen language, live from AI."}
-    ], checklist:["Pick ONE tiny goal","Close all other tabs","Phone face down","Start 15 min sprint","No perfection, just speed"]},
+    features:[], checklist:["Pick ONE tiny goal","Close all other tabs","Phone face down","Start 15 min sprint","No perfection, just speed"]},
   cube:{name:"Cube - Routine / Earth", desc:"6 faces • Earth • 60 min routine. For: mornings, habits, structure.", mode:"Routine Mode • Cube • 60 min", minutes:60, emoji:"⬛", color:0xD4AF37, label:"CUBE • TAP ME", ritual:{title:"⬛ Cube - Routine Ritual", text:"Cube is structure. Do in order: Water -> Stretch -> 1 habit -> Work. No skipping."},
-    features:[
-      {id:"morning", icon:"🌅", label:"Morning", sub:"Start day", title:"🌅 Morning Routine", text:"1. Drink water. 2. Make bed. 3. Stretch 1 min. 4. Write 1 goal for today."},
-      {id:"habit", icon:"✅", label:"Habit", sub:"Checklist", title:"✅ Habit Tracker", text:"Check off your habits below. Cube tracks them. Don't break the chain."},
-      {id:"water", icon:"💧", label:"Water", sub:"Hydrate", title:"💧 Drink Water", text:"Drink a full glass now. Dehydration = foggy brain."},
-      {id:"food", icon:"🍎", label:"Fuel", sub:"Eat / snack", title:"🍎 Fuel Up", text:"Did you eat? Have a fruit, nuts, or a meal. Brain needs fuel."},
-      {id:"clean", icon:"🧹", label:"Clean Space", sub:"2 min tidy", title:"🧹 Clean Space", text:"2 min tidy: Clear desk, throw trash, close tabs. Clean space = clear mind."},
-      {id:"plan", icon:"📋", label:"Plan Day", sub:"Top 3", title:"📋 Plan Your Day", text:"Write Top 3 things for today. Only 3. Not 10. 3 wins = good day."}
-    ], checklist:["Drink water","Make bed / tidy","Stretch 1 min","Write Top 3 goals","Start first task"]},
+    features:[], checklist:["Drink water","Make bed / tidy","Stretch 1 min","Write Top 3 goals","Start first task"]},
   octa:{name:"Octahedron - Balance / Air", desc:"8 faces • Air • 10 min balance. For: stress, anxiety, reset.", mode:"Balance Mode • Octahedron • 10 min", minutes:10, emoji:"◆", color:0x00F0FF, label:"OCTAHEDRON • TAP ME", ritual:{title:"◆ Octahedron - Balance Ritual", text:"Stop. Feet on floor. Breathe in 4, hold 4, out 6. Do 3 rounds."},
-    features:[
-      {id:"breathe", icon:"🌬️", label:"Breathe", sub:"Box breathing", title:"🌬️ Box Breathing", text:"In 4, Hold 4, Out 4, Hold 4. Do 4 rounds. Heart rate will drop."},
-      {id:"stretch", icon:"🧘", label:"Stretch", sub:"Body reset", title:"🧘 Stretch Reset", text:"Neck rolls, shoulder rolls, touch toes, shake hands. Unclench jaw."},
-      {id:"balance", icon:"⚖️", label:"Balance Check", sub:"How are you?", title:"⚖️ Balance Check", text:"Rate 1-10: Energy? Mood? Focus? Fix the lowest one first."},
-      {id:"grass", icon:"🌿", label:"Touch Grass", sub:"Outside", title:"🌿 Touch Grass", text:"Step outside. Look at sky 30 sec. No screen. Air + sun resets you."},
-      {id:"music", icon:"🎵", label:"Calm Music", sub:"1 song", title:"🎵 Calm Music", text:"Put on 1 calm song, close eyes, just listen. No doing. Just breathing."},
-      {id:"gratitude", icon:"💛", label:"Gratitude", sub:"3 good things", title:"💛 3 Good Things", text:"Name 3 good things today. Small ones count."}
-    ], checklist:["Feet on floor","Breathe 4-4-6 x3","Unclench jaw","Drop shoulders","Ask: Am I balanced?"]},
+    features:[], checklist:["Feet on floor","Breathe 4-4-6 x3","Unclench jaw","Drop shoulders","Ask: Am I balanced?"]},
   dodeca:{name:"Dodecahedron - Ideas / Universe", desc:"12 faces • Universe • 45 min creativity. For: brainstorming, writing, art.", mode:"Creativity Mode • Dodecahedron • 45 min", minutes:45, emoji:"⬣", color:0xB537F2, label:"DODECAHEDRON • TAP ME", ritual:{title:"⬣ Dodecahedron - Idea Ritual", text:"No judging ideas yet. Write 10 bad ideas. Bad ideas lead to good ones."},
-    features:[
-      {id:"ideas", icon:"💡", label:"Idea Gen", sub:"AI Ideas", title:"💡 AI Idea Generator", text:"Tap AI Idea below - AI will invent a brand new idea for you, never seen before."},
-      {id:"story", icon:"📖", label:"Story Spark", sub:"AI Story", title:"📖 AI Story Spark", text:"Tap AI Story Starter - AI writes you a new opening line every time."},
-      {id:"vision", icon:"🔮", label:"Vision", sub:"Future you", title:"🔮 Vision - Future You", text:"Close eyes 30 sec. Picture yourself in 1 year. Write 1 sentence about that person."},
-      {id:"word", icon:"💬", label:"New Word", sub:"Daily Word", title:"💬 Daily Word", text:"Scroll up - your Daily Word is live from the real dictionary. Tap New Word for another."},
-      {id:"game", icon:"🎮", label:"Creative Game", sub:"What if?", title:"🎮 What If Game", text:"What if your crystal could talk? What would it say to you right now? Ask AI below."},
-      {id:"draw", icon:"🎨", label:"Draw", sub:"Doodle 1 min", title:"🎨 Doodle 1 Min", text:"Doodle your crystal. Or a face. No skill needed. Doodling unlocks ideas."}
-    ], checklist:["No judging yet","Write 10 bad ideas","Pick 1 favorite","Expand it 3 lines","Save it for later"]},
+    features:[], checklist:["No judging yet","Write 10 bad ideas","Pick 1 favorite","Expand it 3 lines","Save it for later"]},
   icosa:{name:"Icosahedron - Flow / Water", desc:"20 faces • Water • 25 min flow. For: deep work, studying, coding.", mode:"Flow Mode • Icosahedron • 25 min", minutes:25, emoji:"⬢", color:0x00C896, label:"ICOSAHEDRON • TAP ME", ritual:{title:"⬢ Icosahedron - Flow Ritual", text:"Headphones on. One tab only. Phone away. Tell yourself: 'I am in flow now.'"},
-    features:[
-      {id:"flow", icon:"🌊", label:"Deep Flow", sub:"25 min", title:"🌊 Deep Flow", text:"One task. One timer. No switching. Flow happens when you stay on ONE thing for 20+ min."},
-      {id:"music", icon:"🎧", label:"Focus Music", sub:"Lo-fi", title:"🎧 Focus Music", text:"Put on lo-fi / rain / brown noise. Same playlist every time = brain learns 'this means focus'."},
-      {id:"read", icon:"📖", label:"Read", sub:"AI Quote", title:"📖 AI Quote", text:"Tap AI Quote below - AI invents a brand new quote every time, never from a list."},
-      {id:"language", icon:"🌍", label:"Language", sub:"AI Quiz", title:"🌍 Language - AI Quiz", text:"Tap AI Quiz Me - AI creates a fresh quiz in your chosen language."},
-      {id:"move", icon:"🏃", label:"Move", sub:"Quick stretch", title:"🏃 Move Break", text:"Between flows: 10 squats, shake hands, drink water. Flow needs body too."},
-      {id:"review", icon:"🔁", label:"Review", sub:"What did I learn?", title:"🔁 Review", text:"After flow: Write 1 sentence - What did I learn? If you can say it, you know it."}
-    ], checklist:["Headphones on","One tab only","Phone away","One task only","Stay 20+ min for flow"]}
+    features:[], checklist:["Headphones on","One tab only","Phone away","One task only","Stay 20+ min for flow"]}
 };
 var currentKey='icosa';
 var currentFeatureIndex=0;
@@ -254,6 +213,7 @@ var currentLang='es';
 var langNames={es:'Spanish',it:'Italian',fr:'French',pt:'Portuguese',de:'German',ja:'Japanese',hi:'Hindi',en:'English'};
 var currentAIQuizAnswer='';
 var currentDailyWord='';
+var currentDailyDef='';
 var currentAIText='';
 var scene, camera, renderer, currentMesh=null;
 function init3D(){
@@ -285,7 +245,7 @@ function buildMesh(key){
 }
 function animate3D(){ requestAnimationFrame(animate3D); if(currentMesh){ currentMesh.rotation.y+=0.008; currentMesh.rotation.x+=0.003; } if(renderer) renderer.render(scene,camera); }
 function switchSolid(key, el){
-  currentKey=key; currentFeatureIndex=0;
+  currentKey=key;
   var btns=document.querySelectorAll('.solidBtn');
   for(var i=0;i<btns.length;i++){ btns[i].classList.remove('active'); if(btns[i].getAttribute('data-key')===key) btns[i].classList.add('active'); }
   if(window.timerInt) clearInterval(window.timerInt);
@@ -302,17 +262,7 @@ function switchSolid(key, el){
   document.getElementById('progressFill').style.width='0%';
   document.getElementById('startBtn').textContent="▶ Start "+info.minutes+" min";
   document.getElementById('timerSmall').textContent="Tap Start to begin";
-  updateTimerUI(); renderFeatures(key); showRitual(key);
-}
-function renderFeatures(key){
-  var grid=document.getElementById('grid'); grid.innerHTML='';
-  var list=SOLIDS[key].features;
-  for(var i=0;i<list.length;i++){ (function(f, idx){
-    var d=document.createElement('div'); d.className='tile'+(idx===0?' active':'');
-    d.innerHTML='<span>'+f.icon+'</span><b>'+f.label+'</b><small>'+f.sub+'</small>';
-    d.onclick=function(){ var tiles=document.querySelectorAll('.tile'); for(var t=0;t<tiles.length;t++) tiles[t].classList.remove('active'); d.classList.add('active'); currentFeatureIndex=idx; showFeature(idx); };
-    grid.appendChild(d);
-  })(list[i], i); }
+  updateTimerUI(); showRitual(key);
 }
 function showRitual(key){
   var r=SOLIDS[key].ritual;
@@ -320,19 +270,6 @@ function showRitual(key){
   document.getElementById('cardText').textContent=r.text;
   renderChecklist(key);
 }
-function showFeature(idx){
-  var f=SOLIDS[currentKey].features[idx];
-  document.getElementById('cardTitle').textContent=f.title;
-  document.getElementById('cardText').textContent=f.text;
-  renderChecklist(currentKey);
-}
-function showNextFeature(){
-  currentFeatureIndex=(currentFeatureIndex+1)%SOLIDS[currentKey].features.length;
-  var tiles=document.querySelectorAll('.tile');
-  for(var i=0;i<tiles.length;i++) tiles[i].classList.toggle('active', i===currentFeatureIndex);
-  showFeature(currentFeatureIndex);
-}
-function doCrystalAction(){ showRitual(currentKey); }
 function renderChecklist(key){
   var box=document.getElementById('checkList'); box.innerHTML='';
   SOLIDS[key].checklist.forEach(function(item){
@@ -375,12 +312,14 @@ function pauseTimer(){ window.isPaused=true; document.getElementById('mode').tex
 function resumeTimer(){ window.isPaused=false; document.getElementById('mode').textContent=SOLIDS[currentKey].mode+" • Running"; updateTimerUI(); }
 function stopTimer(){ if(window.timerInt) clearInterval(window.timerInt); window.isRunning=false; window.isPaused=false; totalSeconds=SOLIDS[currentKey].minutes*60; seconds=totalSeconds; document.getElementById('mode').textContent=SOLIDS[currentKey].mode; updateTimerUI(); }
 function tapCrystal(){ if(!window.isRunning) startFocus(); else if(window.isPaused) resumeTimer(); else pauseTimer(); }
-var WORD_BANK=["serendipity","petrichor","sonder","ephemeral","limerence","vellichor","hiraeth","wamble","psithurism","syzygy","apricity","dopamine","resilience","quixotic","effervescent","luminous","solitude","wanderlust","aurora","zephyr","halcyon","euphoria","sonder","mellifluous","ineffable","kismet","ubuntu","meraki","hygge","saudade","tsundoku","wabi-sabi","ikigai","forelsket","mamihlapinatapai","gigil","komorebi","flaneur","joie","sisu","fernweh"];
+var WORD_BANK=["serendipity","petrichor","sonder","ephemeral","limerence","vellichor","hiraeth","wamble","psithurism","syzygy","apricity","dopamine","resilience","quixotic","effervescent","luminous","solitude","wanderlust","aurora","zephyr","halcyon","euphoria","mellifluous","ineffable","kismet","ubuntu","meraki","hygge","saudade","tsundoku","wabi-sabi","ikigai","forelsket","mamihlapinatapai","gigil","komorebi","flaneur","joie","sisu","fernweh"];
 async function loadDailyWord(forceNew){
   var wordEl=document.getElementById('dailyWord');
   var defEl=document.getElementById('dailyWordDef');
   var exEl=document.getElementById('dailyWordEx');
   var metaEl=document.getElementById('dailyWordMeta');
+  document.getElementById('dailyWordTrans').textContent='';
+  document.getElementById('wordSentenceBox').style.display='none';
   var dayIndex = forceNew ? Math.floor(Math.random()*WORD_BANK.length) : (new Date().getDate() % WORD_BANK.length);
   var word = WORD_BANK[dayIndex];
   currentDailyWord = word;
@@ -391,10 +330,11 @@ async function loadDailyWord(forceNew){
     let entry = data[0];
     let meaning = entry.meanings[0];
     let def = meaning.definitions[0];
+    currentDailyDef = `(${meaning.partOfSpeech}) ${def.definition}`;
     wordEl.textContent = word.charAt(0).toUpperCase() + word.slice(1);
-    defEl.textContent = `(${meaning.partOfSpeech}) ${def.definition}`;
+    defEl.textContent = currentDailyDef;
     exEl.textContent = def.example ? `"${def.example}"` : "";
-    metaEl.textContent = entry.phonetic ? `Pronunciation: ${entry.phonetic} • Source: Free Dictionary API • Real, live from internet` : "Source: Free Dictionary API • Real, live from internet";
+    metaEl.textContent = entry.phonetic ? `Pronunciation: ${entry.phonetic} • Source: Free Dictionary API` : "Source: Free Dictionary API";
   } catch(e){
     wordEl.textContent = word;
     defEl.textContent = "Could not load definition - check internet. Tap New Word to try again.";
@@ -419,10 +359,13 @@ function speakAI(){
 }
 async function translateDailyWord(){
   if(!currentDailyWord) return;
+  if(currentLang==='en'){ document.getElementById('dailyWordTrans').textContent = 'Already in English - pick another language above to translate it.'; return; }
+  document.getElementById('dailyWordTrans').textContent = 'Translating...';
   let translated = await translateText(currentDailyWord, currentLang);
-  document.getElementById('dailyWordDef').textContent += ` | ${langNames[currentLang]}: ${translated}`;
+  document.getElementById('dailyWordTrans').textContent = `${langNames[currentLang]}: ${translated}`;
 }
 async function translateText(text, toLang){
+  if(toLang==='en') return text;
   try{
     let res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${toLang}`);
     let data = await res.json();
@@ -434,26 +377,33 @@ function setLang(lang, el){
   document.querySelectorAll('.langBtn').forEach(b=>b.classList.remove('active'));
   if(el) el.classList.add('active');
   document.getElementById('aiDesc').textContent = `Language set to ${langNames[lang]}. AI will now quiz you in ${langNames[lang]}.`;
+  document.getElementById('dailyWordTrans').textContent='';
 }
+function openSaved(){ renderSaved(); document.getElementById('savedDrawer').classList.add('open'); document.getElementById('savedOverlay').classList.add('show'); }
+function closeSaved(){ document.getElementById('savedDrawer').classList.remove('open'); document.getElementById('savedOverlay').classList.remove('show'); }
 function getSavedIdeas(){ try{ return JSON.parse(localStorage.getItem('waveSavedIdeas')||'[]'); }catch(e){ return []; } }
 function renderSaved(){
   var list=getSavedIdeas();
   document.getElementById('savedCount').textContent=list.length;
+  document.getElementById('savedCountTop').textContent=list.length;
   var box=document.getElementById('savedList');
   if(!list.length){ box.innerHTML='<p style="font-size:12px;color:#888;margin-top:10px">No saved ideas yet. Generate an idea and tap Save.</p>'; return; }
   box.innerHTML='';
   list.forEach(function(item, idx){
     var d=document.createElement('div'); d.className='savedItem';
-    d.textContent=item;
+    var title=document.createElement('div'); title.textContent=item.slice(0,120)+'...';
+    var full=document.createElement('div'); full.style.display='none'; full.textContent=item;
+    var toggle=document.createElement('button'); toggle.className='btn small gold'; toggle.textContent='👁 Open';
+    toggle.onclick=function(){ if(full.style.display==='none'){ full.style.display='block'; title.style.display='none'; toggle.textContent='🔽 Close'; } else { full.style.display='none'; title.style.display='block'; toggle.textContent='👁 Open'; } };
     var del=document.createElement('button'); del.className='btn small'; del.textContent='🗑 Delete';
     del.onclick=function(){ var a=getSavedIdeas(); a.splice(idx,1); localStorage.setItem('waveSavedIdeas', JSON.stringify(a)); renderSaved(); };
-    d.appendChild(document.createElement('br')); d.appendChild(del);
+    d.appendChild(title); d.appendChild(full); d.appendChild(document.createElement('br')); d.appendChild(toggle); d.appendChild(del);
     box.appendChild(d);
   });
 }
 function saveCurrentAI(){
   if(!currentAIText || currentAIText.indexOf('thinking')!==-1){ alert('Generate an AI answer first!'); return; }
-  var a=getSavedIdeas(); a.unshift(currentAIText.slice(0,800)); localStorage.setItem('waveSavedIdeas', JSON.stringify(a.slice(0,50))); renderSaved(); addXP(10); alert('Saved! +10 XP');
+  var a=getSavedIdeas(); a.unshift(currentAIText.slice(0,1000)); localStorage.setItem('waveSavedIdeas', JSON.stringify(a.slice(0,50))); renderSaved(); addXP(10); alert('Saved! Tap Saved at top to open it. +10 XP');
 }
 function copyCurrentAI(){
   if(!currentAIText) return;
@@ -465,11 +415,7 @@ async function callAI(prompt){
   document.getElementById('aiQuizBox').style.display='none';
   document.getElementById('aiActions').style.display='none';
   try{
-    let res = await fetch('/.netlify/functions/ai', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({prompt: prompt})
-    });
+    let res = await fetch('/.netlify/functions/ai', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({prompt: prompt}) });
     if(!res.ok) throw new Error("AI function not set up yet");
     let data = await res.json();
     let answer = data.answer || data.text || JSON.stringify(data);
@@ -478,10 +424,10 @@ async function callAI(prompt){
     document.getElementById('aiActions').style.display='flex';
     return answer;
   } catch(e){
-    document.getElementById('aiResult').textContent = "⚠️ AI server not connected yet - using Free Mode. To enable real Wave AI, add your GROQ_API_KEY in Netlify. Falling back to live translation + dictionary...";
+    document.getElementById('aiResult').textContent = "⚠️ AI server not connected yet - using Free Mode.";
     let fallback = await translateText("Hello, how are you today? Good luck with your focus.", currentLang);
     currentAIText = fallback;
-    document.getElementById('aiResult').textContent += `\n\nFree Mode - Translation in ${langNames[currentLang]}: ${fallback}\n\nTip: Set up Groq (free) to unlock full AI.`;
+    document.getElementById('aiResult').textContent += `\n\nFree Mode: ${fallback}`;
     return fallback;
   }
 }
@@ -520,30 +466,40 @@ async function aiTranslate(){
   let text = document.getElementById('aiInput').value.trim() || "I am focused and I am building my future";
   let translated = await translateText(text, currentLang);
   currentAIText = `English: ${text}\n${langNames[currentLang]}: ${translated}`;
-  document.getElementById('aiResult').textContent = currentAIText + `\n\n(Translated live via MyMemory API - free, real translation)`;
+  document.getElementById('aiResult').textContent = currentAIText;
   document.getElementById('aiActions').style.display='flex';
 }
 async function aiMotivate(){
   await callAI(`Seed ${Math.floor(Math.random()*999999)}. Invent a brand new 2-sentence hype motivation right now, from scratch. Do NOT pick from a list. Talk like a cool older brother. Mention Wave Crystal once. Never repeat a previous motivation.`);
 }
 async function aiQuote(){
-  await callAI(`Seed ${Math.floor(Math.random()*999999)}. Invent ONE brand new original quote that has NEVER existed before. Do NOT pick from a list. Do NOT use a famous quote. Make it up right now from scratch about whatever you feel like - life, focus, grind, being different, starting small, confidence, whatever hits hardest today. 1 sentence only, powerful, teen would post it. Then on a new line: Why it hits: 1 sentence.`);
+  await callAI(`Seed ${Math.floor(Math.random()*999999)}. Invent ONE brand new original quote that has NEVER existed before. Do NOT pick from a list. Do NOT use a famous quote. Make it up right now from scratch about whatever you feel like. 1 sentence only, powerful, teen would post it. Then on a new line: Why it hits: 1 sentence.`);
 }
 async function aiMusic(){
-  await callAI(`Seed ${Math.floor(Math.random()*999999)}. You pick the vibe. Do NOT pick from a list I gave you. Choose any mood you want right now - focus, hype, chill, sad, party, late night, heartbreak, whatever. Then recommend 3 REAL songs that exist for that vibe. Format: Vibe: ...\n1. Song - Artist - Why it fits\n2. Song - Artist - Why it fits\n3. Song - Artist - Why it fits\nOnly real songs.`);
+  await callAI(`Seed ${Math.floor(Math.random()*999999)}. You pick the vibe. Do NOT pick from a list I gave you. Choose any mood you want right now. Then recommend 3 REAL songs that exist for that vibe. Format: Vibe: ...\n1. Song - Artist - Why it fits\n2. Song - Artist - Why it fits\n3. Song - Artist - Why it fits\nOnly real songs.`);
 }
 async function aiUseWordInSentence(){
-  if(!currentDailyWord){ document.getElementById('aiResult').textContent='Load a Daily Word first!'; return; }
-  document.getElementById('aiResult').textContent = `🤖 AI is thinking about "${currentDailyWord}"...`;
+  if(!currentDailyWord){ alert('Load a Daily Word first!'); return; }
+  var box=document.getElementById('wordSentenceBox');
+  box.style.display='block';
+  box.textContent=`🤖 AI is thinking about "${currentDailyWord}"...`;
   var cleanWord = currentDailyWord.replace(/[^a-zA-Z-]/g,'');
-  await callAI(`Seed ${Math.floor(Math.random()*999999)}. Use the word "${cleanWord}" in 1 cool sentence a teen would understand. Then translate that sentence to ${langNames[currentLang]}. Format: Sentence: ...\n${langNames[currentLang]}: ...\nPronunciation: ...`);
+  var langPart = currentLang==='en' ? 'Keep the sentence in English and give 1 pronunciation tip.' : `Then translate that sentence to ${langNames[currentLang]}. Format: Sentence: ...\n${langNames[currentLang]}: ...\nPronunciation: ...`;
+  try{
+    let res = await fetch('/.netlify/functions/ai', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({prompt: `Seed ${Math.floor(Math.random()*999999)}. Use the word "${cleanWord}" in 1 cool sentence a teen would understand. ${langPart}`}) });
+    let data = await res.json();
+    let answer = data.answer || data.text || 'No answer';
+    box.textContent = answer;
+    currentAIText = answer;
+  } catch(e){
+    box.textContent = `Example: "Her voice was so mellifluous that everyone stopped to listen." - Try again, check internet.`;
+  }
 }
 function checkAIQuiz(){
   let userAns = document.getElementById('aiQuizInput').value.toLowerCase().trim();
   let correct = currentAIQuizAnswer.toLowerCase().trim();
   if(!userAns){ document.getElementById('aiQuizResult').textContent="Type an answer first!"; return; }
   let userWords = userAns.split(' ').filter(w=>w.length>2);
-  let correctWords = correct.split(' ').filter(w=>w.length>2);
   let matches = userWords.filter(w=> correct.includes(w)).length;
   if(correct.includes(userAns) || userAns.includes(correct) || matches>=1){
     document.getElementById('aiQuizResult').textContent="✅ Correct! +20 XP! AI answer was: " + currentAIQuizAnswer;
@@ -565,7 +521,6 @@ async function realInstall(){
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(function(){}); }
 window.onload=function(){
   init3D();
-  renderFeatures('icosa');
   showRitual('icosa');
   updateTimerUI();
   loadDailyWord(false);
