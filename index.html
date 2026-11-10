@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>WaveCrystal - Wavelord</title>
+<title>Wave Crystal - The Crystal Lab</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0A0A0A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="WaveCrystal">
+<meta name="apple-mobile-web-app-title" content="Wave Crystal">
 <link rel="apple-touch-icon" href="icon.png">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -59,7 +59,6 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
 .checkItem{display:flex;gap:10px;align-items:center;background:#0F0F0F;border:1px solid #222;border-radius:12px;padding:10px;margin-top:8px;cursor:pointer;font-size:13px}
 .checkItem.done{opacity:.5;text-decoration:line-through}
 .checkItem input{width:18px;height:18px;accent-color:#D4AF37}
-/* V4 NEW STYLES */
 #aiBox{width:100%;max-width:520px;margin-top:14px;background:linear-gradient(135deg,#1A1505,#141414);border:1px solid #D4AF37;border-radius:20px;padding:18px}
 #aiBox h3{font-size:16px}
 #aiBox h3 span{color:#D4AF37}
@@ -90,8 +89,8 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
 </head>
 <body>
 <div id="stage">
-  <div id="top"><span>Wavelord • <b>WaveCrystal</b></span><span>V4 • REAL AI</span></div>
-  <div id="title">WaveCrystal<br><span>Now With Real AI.</span></div>
+  <div id="top"><span>Wavelord • <b>Wave Crystal - The Crystal Lab</b></span><span>V4 • REAL AI</span></div>
+  <div id="title">Wave Crystal<br><span>The Crystal Lab • Now With Real AI.</span></div>
   <p id="sub">Real dictionary. Real translation. Real AI questions. Any language.</p>
 
   <div id="streakBar">
@@ -132,7 +131,6 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
     </div>
   </div>
 
-  <!-- DAILY WORD - REAL DICTIONARY API -->
   <div id="dailyWordCard">
     <h3>📖 DAILY WORD <span class="badge">LIVE FROM DICTIONARY</span> <button class="btn small gold" onclick="loadDailyWord(true)" style="float:right">↻ New Word</button></h3>
     <h2 id="dailyWord">Loading...</h2>
@@ -146,9 +144,8 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
     </div>
   </div>
 
-  <!-- AI BRAIN - REAL AI -->
   <div id="aiBox">
-    <h3>🤖 WaveCrystal AI <span>• Powered by Gemini</span></h3>
+    <h3>🤖 Wave AI <span>• Powered by Groq</span></h3>
     <p id="aiDesc">Ask anything. It creates new questions, stories, ideas - never repeats. Pick a language, pick a mode.</p>
     <div id="langPicker">
       <button class="langBtn active" data-lang="es" onclick="setLang('es',this)">🇪🇸 Spanish</button>
@@ -168,7 +165,7 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
       <button class="btn small" onclick="aiMotivate()">🔥 AI Motivate Me</button>
     </div>
     <input id="aiInput" placeholder="Or ask AI anything... e.g. Quiz me in Italian, give me a word, make a story about a crystal">
-    <button class="btn gold" style="margin-top:8px;width:100%" onclick="aiAsk()">✨ Ask WaveCrystal AI</button>
+    <button class="btn gold" style="margin-top:8px;width:100%" onclick="aiAsk()">✨ Ask Wave AI</button>
     <div id="aiResult"></div>
     <div id="aiQuizBox" style="display:none;margin-top:10px">
       <input id="aiQuizInput" placeholder="Type your answer here..." style="width:100%;padding:12px;border-radius:12px;border:1px solid #333;background:#000;color:#fff;font-size:14px">
@@ -190,14 +187,13 @@ body{background:#0A0A0A;font-family:Inter, Arial, sans-serif;color:#F5F0E6;overf
   <div id="grid"></div>
 
   <button id="installReal" onclick="realInstall()">
-    <b id="installTitle">📲 Install WaveCrystal</b>
+    <b id="installTitle">📲 Install Wave Crystal - The Crystal Lab</b>
     <p id="installText">Tap to install - real system popup</p>
   </button>
-  <p id="foot">WaveCrystal V4 by Wavelord • Real Dictionary • Real Translation • Real AI<br>Your progress saves on your phone</p>
+  <p id="foot">Wave Crystal - The Crystal Lab V4 by Wavelord • Real Dictionary • Real Translation • Real AI<br>Your progress saves on your phone</p>
 </div>
 
 <script>
-// ============ DATA ============
 var SOLIDS={
   tetra:{name:"Tetrahedron - Sprint / Fire", desc:"4 faces • Fire • 15 min sprint. For: homework, quick tasks, beating procrastination.", mode:"Sprint Mode • Tetrahedron • 15 min", minutes:15, emoji:"🔺", color:0xFF6B00, label:"TETRAHEDRON • TAP ME", ritual:{title:"🔺 Tetrahedron - Sprint Ritual", text:"Set ONE tiny goal. Example: 'Write 1 paragraph'. Set timer 15 min. No perfection. Just speed. Go!"},
     features:[
@@ -251,8 +247,6 @@ var currentLang='es';
 var langNames={es:'Spanish',it:'Italian',fr:'French',pt:'Portuguese',de:'German',ja:'Japanese',hi:'Hindi',en:'English'};
 var currentAIQuizAnswer='';
 var currentDailyWord='';
-
-// ============ 3D ============
 var scene, camera, renderer, currentMesh=null;
 function init3D(){
   if(typeof THREE==='undefined'){ document.getElementById('fallback').style.display='block'; return; }
@@ -282,8 +276,6 @@ function buildMesh(key){
   scene.add(group); currentMesh=group;
 }
 function animate3D(){ requestAnimationFrame(animate3D); if(currentMesh){ currentMesh.rotation.y+=0.008; currentMesh.rotation.x+=0.003; } if(renderer) renderer.render(scene,camera); }
-
-// ============ SWITCH ============
 function switchSolid(key, el){
   currentKey=key; currentFeatureIndex=0;
   var btns=document.querySelectorAll('.solidBtn');
@@ -342,8 +334,6 @@ function renderChecklist(key){
     box.appendChild(d);
   });
 }
-
-// ============ STREAK + XP ============
 var today=new Date().toDateString();
 var saved=JSON.parse(localStorage.getItem('waveCrystalV4')||'{"streak":1,"lastDay":"","todaySessions":0,"total":0,"xp":0}');
 if(saved.lastDay!==today){ if(saved.lastDay){ var y=new Date(Date.now()-86400000).toDateString(); if(saved.lastDay===y) saved.streak++; else saved.streak=1; } saved.todaySessions=0; saved.lastDay=today; }
@@ -351,8 +341,6 @@ function save(){ localStorage.setItem('waveCrystalV4', JSON.stringify(saved)); u
 function updateStats(){ document.getElementById('streakNum').textContent="🔥 "+saved.streak; document.getElementById('sessionNum').textContent=saved.todaySessions; document.getElementById('totalNum').textContent=saved.total; document.getElementById('xpNum').textContent=saved.xp+" XP"; }
 function addXP(n){ saved.xp+=n; save(); }
 updateStats();
-
-// ============ TIMER ============
 var totalSeconds=25*60, seconds=totalSeconds;
 window.timerInt=null; window.isRunning=false; window.isPaused=false;
 function format(s){ var m=Math.floor(s/60), sec=s%60; return String(m).padStart(2,'0')+":"+String(sec).padStart(2,'0'); }
@@ -373,21 +361,18 @@ function startFocus(){
   saved.todaySessions++; saved.total++; addXP(10); save();
   document.getElementById('mode').textContent=SOLIDS[currentKey].mode+" • Running";
   updateTimerUI();
-  window.timerInt=setInterval(function(){ if(window.isPaused) return; seconds--; updateTimerUI(); if(seconds<=0){ clearInterval(window.timerInt); window.isRunning=false; window.isPaused=false; updateTimerUI(); addXP(50); alert("WaveCrystal: "+SOLIDS[currentKey].minutes+" min done! +50 XP! Break time."); } },1000);
+  window.timerInt=setInterval(function(){ if(window.isPaused) return; seconds--; updateTimerUI(); if(seconds<=0){ clearInterval(window.timerInt); window.isRunning=false; window.isPaused=false; updateTimerUI(); addXP(50); alert("Wave Crystal - The Crystal Lab: "+SOLIDS[currentKey].minutes+" min done! +50 XP! Break time."); } },1000);
 }
 function pauseTimer(){ window.isPaused=true; document.getElementById('mode').textContent=SOLIDS[currentKey].mode+" • Paused ⏸"; updateTimerUI(); }
 function resumeTimer(){ window.isPaused=false; document.getElementById('mode').textContent=SOLIDS[currentKey].mode+" • Running"; updateTimerUI(); }
 function stopTimer(){ if(window.timerInt) clearInterval(window.timerInt); window.isRunning=false; window.isPaused=false; totalSeconds=SOLIDS[currentKey].minutes*60; seconds=totalSeconds; document.getElementById('mode').textContent=SOLIDS[currentKey].mode; updateTimerUI(); }
 function tapCrystal(){ if(!window.isRunning) startFocus(); else if(window.isPaused) resumeTimer(); else pauseTimer(); }
-
-// ============ V4: REAL DICTIONARY API - DAILY WORD ============
 var WORD_BANK=["serendipity","petrichor","sonder","ephemeral","limerence","vellichor","hiraeth","wamble","psithurism","syzygy","apricity","dopamine","resilience","quixotic","effervescent","luminous","solitude","wanderlust","aurora","zephyr","halcyon","euphoria","sonder","mellifluous","ineffable","kismet","ubuntu","meraki","hygge","saudade","tsundoku","wabi-sabi","ikigai","forelsket","mamihlapinatapai","gigil","komorebi","flaneur","joie","sisu","fernweh"];
 async function loadDailyWord(forceNew){
   var wordEl=document.getElementById('dailyWord');
   var defEl=document.getElementById('dailyWordDef');
   var exEl=document.getElementById('dailyWordEx');
   var metaEl=document.getElementById('dailyWordMeta');
-  // Pick word based on day, so everyone gets same word today, unless forceNew
   var dayIndex = forceNew ? Math.floor(Math.random()*WORD_BANK.length) : (new Date().getDate() % WORD_BANK.length);
   var word = WORD_BANK[dayIndex];
   currentDailyWord = word;
@@ -417,8 +402,6 @@ async function translateDailyWord(){
   let translated = await translateText(currentDailyWord, currentLang);
   document.getElementById('dailyWordDef').textContent += ` | ${langNames[currentLang]}: ${translated}`;
 }
-
-// ============ V4: REAL TRANSLATION API - MyMemory FREE ============
 async function translateText(text, toLang){
   try{
     let res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${toLang}`);
@@ -432,13 +415,10 @@ function setLang(lang, el){
   if(el) el.classList.add('active');
   document.getElementById('aiDesc').textContent = `Language set to ${langNames[lang]}. AI will now quiz you in ${langNames[lang]}.`;
 }
-
-// ============ V4: REAL AI - CALLS NETLIFY FUNCTION ============
 async function callAI(prompt){
-  document.getElementById('aiResult').textContent = "🤖 AI is thinking... (calling Gemini)";
+  document.getElementById('aiResult').textContent = "🤖 AI is thinking... (calling Groq)";
   document.getElementById('aiQuizBox').style.display='none';
   try{
-    // Try Netlify Function first (real Gemini AI)
     let res = await fetch('/.netlify/functions/ai', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -450,11 +430,9 @@ async function callAI(prompt){
     document.getElementById('aiResult').textContent = answer;
     return answer;
   } catch(e){
-    // FALLBACK: If AI function not set up yet, use free APIs + local generation so app still works
-    document.getElementById('aiResult').textContent = "⚠️ AI server not connected yet - using Free Mode. To enable real Gemini AI, add your key in Netlify (see instructions below). Falling back to live translation + dictionary...";
-    // Fallback: translate the prompt topic
+    document.getElementById('aiResult').textContent = "⚠️ AI server not connected yet - using Free Mode. To enable real Wave AI, add your GROQ_API_KEY in Netlify. Falling back to live translation + dictionary...";
     let fallback = await translateText("Hello, how are you today? Good luck with your focus.", currentLang);
-    document.getElementById('aiResult').textContent += `\n\nFree Mode - Translation in ${langNames[currentLang]}: ${fallback}\n\nTip: Set up Gemini (free) to unlock full AI.`;
+    document.getElementById('aiResult').textContent += `\n\nFree Mode - Translation in ${langNames[currentLang]}: ${fallback}\n\nTip: Set up Groq (free) to unlock full AI.`;
     return fallback;
   }
 }
@@ -467,7 +445,6 @@ async function aiQuiz(){
   document.getElementById('aiQuizBox').style.display='block';
   let prompt = `Create ONE beginner language quiz question in ${langNames[currentLang]}. The user is learning ${langNames[currentLang]}. Give a question like "How do you say 'Hello, how are you?' in ${langNames[currentLang]}?" Then give the correct answer on a new line starting with ANSWER: . Keep it simple. Only one question.`;
   let answer = await callAI(prompt);
-  // Try to extract ANSWER: line
   let match = answer.match(/ANSWER:\s*(.+)/i);
   if(match) currentAIQuizAnswer = match[1].trim();
   else currentAIQuizAnswer = answer;
@@ -494,7 +471,6 @@ async function aiUseWordInSentence(){
 function checkAIQuiz(){
   let userAns = document.getElementById('aiQuizInput').value.toLowerCase().trim();
   let correct = currentAIQuizAnswer.toLowerCase().trim();
-  // Fuzzy check: if user typed at least 50% of correct words, count as correct
   if(!userAns){ document.getElementById('aiQuizResult').textContent="Type an answer first!"; return; }
   if(correct.includes(userAns) || userAns.includes(correct) || userAns.length>2 && correct.split(' ').some(w=> userAns.includes(w.toLowerCase()))){
     document.getElementById('aiQuizResult').textContent="✅ Correct! +20 XP! You got it!";
@@ -503,8 +479,6 @@ function checkAIQuiz(){
     document.getElementById('aiQuizResult').textContent=`Not quite. AI says correct answer is: ${currentAIQuizAnswer}. Try again!`;
   }
 }
-
-// ============ INSTALL ============
 var deferredPrompt=null;
 window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferredPrompt=e; });
 window.addEventListener('appinstalled', function(){ document.getElementById('installTitle').textContent="✅ App Installed"; });
@@ -516,7 +490,6 @@ async function realInstall(){
   else alert("Android:\n1. Tap 3 dots top right\n2. Install App / Add to Home Screen\n3. Tap Install");
 }
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(function(){}); }
-
 window.onload=function(){
   init3D();
   renderFeatures('icosa');
