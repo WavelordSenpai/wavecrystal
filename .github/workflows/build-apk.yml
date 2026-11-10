@@ -18,6 +18,11 @@ jobs:
           java-version: 17
       - name: Install Capacitor
         run: npm install @capacitor/core @capacitor/cli @capacitor/android typescript
+      - name: Fix Config
+        run: |
+          rm -f capacitor.config.ts
+          printf "const config = {\n  appId: 'com.wavecrystal.app',\n  appName: 'WaveCrystal',\n  webDir: 'www'\n};\nmodule.exports = config;\n" > capacitor.config.js
+          ls -l capacitor.config.*
       - name: Add Android
         run: npx cap add android
       - name: Copy Overlay Files
