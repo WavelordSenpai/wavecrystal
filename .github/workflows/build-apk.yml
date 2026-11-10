@@ -22,7 +22,6 @@ jobs:
         run: |
           rm -f capacitor.config.ts
           printf "const config = {\n  appId: 'com.wavecrystal.app',\n  appName: 'WaveCrystal',\n  webDir: 'www'\n};\nmodule.exports = config;\n" > capacitor.config.js
-          ls -l capacitor.config.*
       - name: Add Android
         run: npx cap add android
       - name: Copy Overlay Files
@@ -48,9 +47,19 @@ jobs:
           mkdir -p www
           if [ -f index.html ]; then cp index.html www/index.html; fi
           if [ -f www/index.html ]; then echo "found index.html"; else printf "<html><body><h1>WaveCrystal</h1></body></html>" > www/index.html; fi
-          ls -l www/
       - name: Sync
         run: npx cap sync android
+      - name: Fix Duplicate Kotlin
+        run: |
+          python3 -c "
+          import pathlib
+          p = pathlib.Path('android/app/build.gradle')
+          t = p.read_text()
+          if 'kotlin-stdlib-jdk7' not in t:
+              t = t.replace('android {', 'configurations.all {\n    exclude group: \"org.jetbrains.kotlin\", module: \"kotlin-stdlib-jdk7\"\n    exclude group: \"org.jetbrains.kotlin\", module: \"kotlin-stdlib-jdk8\"\n}\n\nandroid {')
+              p.write_text(t)
+          print('kotlin fix done')
+          "
       - name: Build APK
         run: cd android && chmod +x gradlew && ./gradlew assembleDebug
       - name: Upload APK
