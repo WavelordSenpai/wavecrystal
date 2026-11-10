@@ -43,6 +43,12 @@ jobs:
           p.write_text(t)
           print('patched')
           "
+      - name: Create Web Assets
+        run: |
+          mkdir -p www
+          if [ -f index.html ]; then cp index.html www/index.html; fi
+          if [ -f www/index.html ]; then echo "found index.html"; else printf "<html><body><h1>WaveCrystal</h1></body></html>" > www/index.html; fi
+          ls -l www/
       - name: Sync
         run: npx cap sync android
       - name: Build APK
