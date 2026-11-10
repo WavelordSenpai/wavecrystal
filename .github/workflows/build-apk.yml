@@ -28,6 +28,7 @@ jobs:
           cp index.html www/index.html
           cp manifest.json www/manifest.json || true
           cp sw.js www/sw.js || true
+          cp bubble.html www/bubble.html || true
           cp icon.png www/icon.png || true
           cp fix.js www/fix.js || true
       - name: Add Android platform if needed
