@@ -48,9 +48,29 @@ jobs:
           mkdir -p android/app/src/main/res/drawable
           cp overlay/FloatingService.java android/app/src/main/java/com/wavecrystal/app/
           cp overlay/MainActivity.java android/app/src/main/java/com/wavecrystal/app/
-          cp overlay/float_crystal.xml android/app/src/main/res/layout/
-          cp overlay/bubble_bg.xml android/app/src/main/res/drawable/
           cp icon.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+          cat > android/app/src/main/res/layout/float_crystal.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="72dp"
+              android:layout_height="72dp">
+              <ImageView
+                  android:id="@+id/crystalIcon"
+                  android:layout_width="72dp"
+                  android:layout_height="72dp"
+                  android:src="@mipmap/ic_launcher"
+                  android:background="@drawable/bubble_bg"
+                  android:contentDescription="Wave Crystal" />
+          </FrameLayout>
+          EOF
+          cat > android/app/src/main/res/drawable/bubble_bg.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android"
+              android:shape="oval">
+              <solid android:color="#CC7C4DFF" />
+              <stroke android:width="2dp" android:color="#FFFFFF" />
+          </shape>
+          EOF
 
       - name: Build APK
         run: |
