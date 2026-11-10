@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="72dp"
-    android:layout_height="72dp">
-
+    android:layout_width="64dp"
+    android:layout_height="64dp">
     <ImageView
         android:id="@+id/crystalIcon"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:src="@mipmap/ic_launcher"
         android:background="@drawable/bubble_bg"
         android:contentDescription="Wave Crystal" />
-
 </FrameLayout>
