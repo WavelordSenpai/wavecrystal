@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="72dp"
-    android:layout_height="72dp"
-    android:background="@drawable/bubble_bg">
+    android:layout_width="150dp"
+    android:layout_height="150dp"
+    android:background="@android:color/transparent">
 
-    <TextView
+    <WebView
+        android:id="@+id/crystalWebView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="💎"
-        android:textSize="32sp"
-        android:gravity="center" />
+        android:background="@android:color/transparent" />
 </FrameLayout>
