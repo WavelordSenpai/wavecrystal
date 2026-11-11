@@ -296,7 +296,7 @@ let usedText = used.slice(-20).join(', ');
     exEl.textContent = j.example ? '"'+j.example+'"' : '';
     metaEl.textContent = (j.pronunciation ? 'Pronunciation: '+j.pronunciation+' • ' : '') + 'Source: Wave AI • Powered by Groq';
   }catch(e){
-    var word = var unusedBank = WORD_BANK.filter(w=>!used.includes(w));
+    var unusedBank = WORD_BANK.filter(w=>!used.includes(w));
 if(!unusedBank.length){ used=[]; unusedBank=WORD_BANK; }
 var word = unusedBank[Math.floor(Math.random()*unusedBank.length)];
     currentDailyWord = word;
