@@ -25,6 +25,7 @@ jobs:
       - name: Create www folder
         run: |
           mkdir -p www
+          curl -o www/three.min.js https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js
           cp index.html www/index.html
           cp manifest.json www/manifest.json || true
           cp sw.js www/sw.js || true
