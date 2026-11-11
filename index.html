@@ -155,7 +155,7 @@ body.bubble-mode{background:#0A0A0A !important}
   </div>
   <div id="dailyWordCard">
     <h3>📖 DAILY WORD <span class="badge">LIVE FROM DICTIONARY</span> <button class="btn small gold" onclick="loadDailyWord(true)" style="float:right">↻ New Word</button></h3>
-    <h2 id="dailyWord">Loading...</h2>
+       <h2 id="dailyWord" onclick="speakWord()" style="cursor:pointer">Loading... 🔊</h2>
     <p id="dailyWordDef">Fetching real definition from dictionary...</p>
     <p id="dailyWordEx" style="color:#D4AF37;font-style:italic"></p>
     <small id="dailyWordMeta"></small><br>
@@ -275,24 +275,30 @@ async function loadDailyWord(forceNew){
   defEl.textContent='';
   exEl.textContent='';
   metaEl.textContent='';
+  let used = [];
+try{ used = JSON.parse(localStorage.getItem('wc_usedWords')||'[]'); }catch(e){}
+let usedText = used.slice(-20).join(', ');
   try{
     let res = await fetch('https://wavecrystal.netlify.app/.netlify/functions/ai', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({prompt: `Seed ${Math.floor(Math.random()*999999)}. Give me ONE cool, rare, hype English word a teen would love. Return ONLY JSON like this: {"word":"...","definition":"1 simple line","example":"1 cool sentence using it","pronunciation":"easy to read"}`})
+      body: JSON.stringify({prompt: `Seed ${Math.floor(Math.random()*999999)}. Give me ONE cool, rare, hype English word a teen would love. DO NOT use any of these already used words: ${usedText}. Return ONLY JSON like this: {"word":"...","definition":"1 simple line","example":"1 cool sentence using it","pronunciation":"easy to read"}`})
     });
     let data = await res.json();
     let answer = data.answer || data.text || '';
     answer = answer.replace(/```json|```/g,'').trim();
     let j = JSON.parse(answer);
     currentDailyWord = j.word;
+    used.push(j.word.toLowerCase()); localStorage.setItem('wc_usedWords', JSON.stringify(used.slice(-50)));
     currentDailyDef = j.definition;
     wordEl.textContent = j.word.charAt(0).toUpperCase()+j.word.slice(1);
     defEl.textContent = j.definition;
     exEl.textContent = j.example ? '"'+j.example+'"' : '';
     metaEl.textContent = (j.pronunciation ? 'Pronunciation: '+j.pronunciation+' • ' : '') + 'Source: Wave AI • Powered by Groq';
   }catch(e){
-    var word = WORD_BANK[Math.floor(Math.random()*WORD_BANK.length)];
+    var word = var unusedBank = WORD_BANK.filter(w=>!used.includes(w));
+if(!unusedBank.length){ used=[]; unusedBank=WORD_BANK; }
+var word = unusedBank[Math.floor(Math.random()*unusedBank.length)];
     currentDailyWord = word;
     wordEl.textContent = word.charAt(0).toUpperCase()+word.slice(1);
     defEl.textContent = 'Tap "AI: Use In Sentence" to get the definition from Wave AI.';
@@ -301,8 +307,8 @@ async function loadDailyWord(forceNew){
 }
   
 var LANG_VOICE = {es:'es-ES', it:'it-IT', fr:'fr-FR', pt:'pt-PT', de:'de-DE', ja:'ja-JP', hi:'hi-IN', en:'en-US'};
-function speakWord(){ if(!currentDailyWord) return; speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(currentDailyWord); u.lang = LANG_VOICE[currentLang] || 'en-US'; u.rate = 0.9; speechSynthesis.speak(u);}
-function speakAI(){ if(!currentAIText){ alert('Generate an AI answer first, then tap Speak'); return; } speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(currentAIText.slice(0,300)); u.lang = LANG_VOICE[currentLang] || 'en-US'; u.rate = 0.95; speechSynthesis.speak(u);}
+function speakWord(){ if(!currentDailyWord) return; try{ speechSynthesis.cancel(); }catch(e){} var u = new SpeechSynthesisUtterance(currentDailyWord); u.lang = 'en-US'; u.rate = 0.85; var voices = speechSynthesis.getVoices(); var enVoice = voices.find(v=>v.lang && v.lang.toLowerCase().startsWith('en')); if(enVoice) u.voice = enVoice; speechSynthesis.speak(u); }
+function speakAI(){ if(!currentAIText){ alert('Generate an AI answer first, then tap Speak'); return; } try{ speechSynthesis.cancel(); }catch(e){} var u = new SpeechSynthesisUtterance(currentAIText.slice(0,300)); u.lang = 'en-US'; u.rate = 0.95; var voices = speechSynthesis.getVoices(); var enVoice = voices.find(v=>v.lang && v.lang.toLowerCase().startsWith('en')); if(enVoice) u.voice = enVoice; speechSynthesis.speak(u); }
 async function translateDailyWord(){
   if(!currentDailyWord) return;
   if(currentLang==='en'){
@@ -424,5 +430,6 @@ function goFull(){
   window.addEventListener('mouseup', end);
 })();
 </script>
+  <script>if('speechSynthesis' in window){ speechSynthesis.getVoices(); setTimeout(function(){ speechSynthesis.getVoices(); }, 500); } window.addEventListener('click', function(){ if('speechSynthesis' in window){ speechSynthesis.getVoices(); } }, {once:true});</script>
 </body>
 </html>
