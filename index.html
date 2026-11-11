@@ -298,7 +298,7 @@ async function loadDailyWord(forceNew){
     defEl.textContent = 'Tap "AI: Use In Sentence" to get the definition from Wave AI.';
     metaEl.textContent = 'Source: Wave AI • Powered by Groq';
   }
-  }
+  
 var LANG_VOICE = {es:'es-ES', it:'it-IT', fr:'fr-FR', pt:'pt-PT', de:'de-DE', ja:'ja-JP', hi:'hi-IN', en:'en-US'};
 function speakWord(){ if(!currentDailyWord) return; speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(currentDailyWord); u.lang = LANG_VOICE[currentLang] || 'en-US'; u.rate = 0.9; speechSynthesis.speak(u);}
 function speakAI(){ if(!currentAIText){ alert('Generate an AI answer first, then tap Speak'); return; } speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(currentAIText.slice(0,300)); u.lang = LANG_VOICE[currentLang] || 'en-US'; u.rate = 0.95; speechSynthesis.speak(u);}
@@ -326,6 +326,7 @@ async function translateText(text, toLang){
   } catch(e){
     return text;
   }
+}
 
 
 function setLang(lang, el){
