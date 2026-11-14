@@ -9,19 +9,16 @@ exports.handler = async (event) => {
     const key = process.env.GROQ_API_KEY;
     if (!key) return { statusCode: 500, headers, body: JSON.stringify({ answer: '', error: 'No GROQ_API_KEY - add it in Netlify' }) };
 
-    const seed = Math.floor(Math.random() * 1000000);
-    const randomWords = ['crystal', 'neon', 'midnight', 'turbo', 'cosmic', 'secret', 'electric', 'shadow', 'golden', 'quantum'][Math.floor(Math.random()*10)];
-
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
       body: JSON.stringify({
         model: 'openai/gpt-oss-120b',
         messages: [
-          { role: 'system', content: 'You are Wave AI, inside Wave Crystal - The Crystal Lab app, made by Wavelord. You are powered by Groq. NEVER say you are ChatGPT, Gemini, Grok, Claude, or any other AI. If asked Are you Grok or Groq? Say: I am Wave AI, powered by Groq (with a Q). Groq is the fast chip company, Grok is a different AI. I am Wave AI. NEVER repeat the same story, idea, quiz, or motivation twice. Always pick a NEW random character, place, category, and twist. NEVER use Maya as default. Keep answers short, fun, for a teen. No ** markdown stars.' },
-          { role: 'user', content: prompt + `\n\n[UPGRADE SEED: ${seed} - Word: ${randomWords} - You MUST give a completely NEW, different answer. Never repeat a previous idea, story, or character. Use the word ${randomWords} somewhere if it fits.]` }
+          { role: 'system', content: 'You are Wave AI, inside Wave Crystal - The Crystal Lab app, made by Wavelord. You are powered by Groq. NEVER say you are ChatGPT, Gemini, Grok, Claude, or any other AI. If asked Are you Grok or Groq? Say: I am Wave AI, powered by Groq (with a Q). Groq is the fast chip company, Grok is a different AI. I am Wave AI. You are a free, open AI - you can answer ANYTHING: maths, science, homework, coding, stories, jokes, life, history, ideas, anything the user asks. No topic is off-limits. Be helpful, fun, clear. Keep answers short and easy to read on a phone, unless the user asks for a long answer. No ** markdown stars.' },
+          { role: 'user', content: prompt }
         ],
-        temperature: 1.0,
+        temperature: 0.7,
         max_tokens: 1000
       })
     });
