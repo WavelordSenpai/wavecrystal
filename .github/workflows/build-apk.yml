@@ -11,17 +11,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
+
       - name: Install dependencies
         run: npm install
+
       - name: Create www folder
         run: |
           mkdir -p www
@@ -30,14 +34,21 @@ jobs:
           cp manifest.json www/manifest.json || true
           cp sw.js www/sw.js || true
           cp bubble.html www/bubble.html || true
-          cp icon.png www/icon.png || true
+          cp resources/icon.png www/icon.png || true
           cp fix.js www/fix.js || true
+
       - name: Add Android platform if needed
         run: |
           if [ ! -d "android" ]; then
             npx cap add android
           fi
+
+      - name: Generate icons from resources/icon.png
+        run: |
+          npm install -D @capacitor/assets
+          npx @capacitor/assets generate --iconBackgroundColor '#000000' --iconBackgroundColorDark '#000000'
           npx cap sync android
+
       - name: Copy overlay files into Android project
         run: |
           mkdir -p android/app/src/main/java/com/wavecrystal/app
@@ -49,6 +60,7 @@ jobs:
           cp overlay/float_crystal.xml android/app/src/main/res/layout/float_crystal.xml
           cp overlay/bubble_bg.xml android/app/src/main/res/drawable/bubble_bg.xml
           cp overlay/crystal.html android/app/src/main/assets/crystal.html
+
       - name: Add overlay permission
         run: |
           MANIFEST=android/app/src/main/AndroidManifest.xml
@@ -56,11 +68,13 @@ jobs:
             sed -i 's|<uses-permission android:name="android.permission.INTERNET" />|<uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />|' $MANIFEST
           fi
           grep -q "FloatingService" $MANIFEST || sed -i 's|</application>|        <service android:name=".FloatingService" android:exported="false" />\n    </application>|' $MANIFEST
+
       - name: Build APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
